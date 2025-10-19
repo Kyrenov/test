@@ -16,7 +16,8 @@
             background: transparent;
             display: flex;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-start;
+            padding-left: 50px;
             min-height: 100vh;
             overflow: hidden;
         }
@@ -376,6 +377,8 @@
         let currentIndex = 0;
         let itemStates = {};
 
+        console.log('[AVARIS] Script initializing...');
+
         function renderMainMenu() {
             currentMenu = 'main';
             currentIndex = 0;
@@ -384,19 +387,25 @@
 
             menuTitle.textContent = 'Main menu';
 
-            menuContent.innerHTML = `
-                <div class="scroll-indicator" id="scrollIndicator"></div>
-                <li class="menu-item has-submenu selected" data-index="0">Player</li>
-                <li class="menu-item has-submenu" data-index="1">Server</li>
-                <li class="menu-item has-submenu" data-index="2">Weapon</li>
-                <li class="menu-item has-submenu" data-index="3">Combat</li>
-                <li class="menu-item has-submenu" data-index="4">Vehicle</li>
-                <li class="menu-item has-submenu" data-index="5">Visual</li>
-                <li class="menu-item has-submenu" data-index="6">Miscellaneous</li>
-                <li class="menu-item has-submenu" data-index="7">Settings</li>
-                <li class="menu-item search" data-index="8">Search</li>
-            `;
-            updateScrollIndicator();
+            // Fade out current items
+            const currentItems = menuContent.querySelectorAll('.menu-item, .back-button');
+            currentItems.forEach(item => item.classList.add('fade-out'));
+
+            setTimeout(() => {
+                menuContent.innerHTML = `
+                    <div class="scroll-indicator" id="scrollIndicator"></div>
+                    <li class="menu-item has-submenu selected fade-in" data-index="0">Player</li>
+                    <li class="menu-item has-submenu fade-in" data-index="1" style="animation-delay: 0.03s">Server</li>
+                    <li class="menu-item has-submenu fade-in" data-index="2" style="animation-delay: 0.06s">Weapon</li>
+                    <li class="menu-item has-submenu fade-in" data-index="3" style="animation-delay: 0.09s">Combat</li>
+                    <li class="menu-item has-submenu fade-in" data-index="4" style="animation-delay: 0.12s">Vehicle</li>
+                    <li class="menu-item has-submenu fade-in" data-index="5" style="animation-delay: 0.15s">Visual</li>
+                    <li class="menu-item has-submenu fade-in" data-index="6" style="animation-delay: 0.18s">Miscellaneous</li>
+                    <li class="menu-item has-submenu fade-in" data-index="7" style="animation-delay: 0.21s">Settings</li>
+                    <li class="menu-item search fade-in" data-index="8" style="animation-delay: 0.24s">Search</li>
+                `;
+                updateScrollIndicator();
+            }, 150);
         }
 
         function renderSubmenu(menuName) {
@@ -410,48 +419,55 @@
 
             menuTitle.textContent = submenu.title;
 
-            let html = '<div class="scroll-indicator" id="scrollIndicator"></div>';
-            html += '<button class="back-button selected" data-index="0">← Back</button>';
-            
-            submenu.items.forEach((item, index) => {
-                const itemId = `${menuName}_${index}`;
-                const itemIndex = index + 1;
-                
-                if (item.type === 'toggle') {
-                    const isActive = itemStates[itemId] || false;
-                    html += `
-                        <li class="menu-item submenu-item" data-index="${itemIndex}" data-id="${itemId}">
-                            <span>${item.name}</span>
-                            <div class="toggle-switch ${isActive ? 'active' : ''}" id="${itemId}"></div>
-                        </li>
-                    `;
-                } else if (item.type === 'slider') {
-                    const value = itemStates[itemId] !== undefined ? itemStates[itemId] : item.value;
-                    const percentage = ((value - item.min) / (item.max - item.min)) * 100;
-                    html += `
-                        <li class="menu-item submenu-item" data-index="${itemIndex}" data-id="${itemId}">
-                            <span>${item.name}</span>
-                            <div class="slider-container">
-                                <div class="slider">
-                                    <div class="slider-fill" style="width: ${percentage}%"></div>
-                                </div>
-                                <span class="slider-value">${value}</span>
-                            </div>
-                        </li>
-                    `;
-                } else if (item.type === 'list') {
-                    const currentValue = itemStates[itemId] !== undefined ? itemStates[itemId] : item.value;
-                    html += `
-                        <li class="menu-item submenu-item" data-index="${itemIndex}" data-id="${itemId}">
-                            <span>${item.name}</span>
-                            <span class="slider-value">- ${item.options[currentValue]} -</span>
-                        </li>
-                    `;
-                }
-            });
+            // Fade out current items
+            const currentItems = menuContent.querySelectorAll('.menu-item, .back-button');
+            currentItems.forEach(item => item.classList.add('fade-out'));
 
-            menuContent.innerHTML = html;
-            updateScrollIndicator();
+            setTimeout(() => {
+                let html = '<div class="scroll-indicator" id="scrollIndicator"></div>';
+                html += '<button class="back-button selected fade-in" data-index="0">← Back</button>';
+                
+                submenu.items.forEach((item, index) => {
+                    const itemId = `${menuName}_${index}`;
+                    const itemIndex = index + 1;
+                    const delay = (index + 1) * 0.03;
+                    
+                    if (item.type === 'toggle') {
+                        const isActive = itemStates[itemId] || false;
+                        html += `
+                            <li class="menu-item submenu-item fade-in" data-index="${itemIndex}" data-id="${itemId}" style="animation-delay: ${delay}s">
+                                <span>${item.name}</span>
+                                <div class="toggle-switch ${isActive ? 'active' : ''}" id="${itemId}"></div>
+                            </li>
+                        `;
+                    } else if (item.type === 'slider') {
+                        const value = itemStates[itemId] !== undefined ? itemStates[itemId] : item.value;
+                        const percentage = ((value - item.min) / (item.max - item.min)) * 100;
+                        html += `
+                            <li class="menu-item submenu-item fade-in" data-index="${itemIndex}" data-id="${itemId}" style="animation-delay: ${delay}s">
+                                <span>${item.name}</span>
+                                <div class="slider-container">
+                                    <div class="slider">
+                                        <div class="slider-fill" style="width: ${percentage}%"></div>
+                                    </div>
+                                    <span class="slider-value">${value}</span>
+                                </div>
+                            </li>
+                        `;
+                    } else if (item.type === 'list') {
+                        const currentValue = itemStates[itemId] !== undefined ? itemStates[itemId] : item.value;
+                        html += `
+                            <li class="menu-item submenu-item fade-in" data-index="${itemIndex}" data-id="${itemId}" style="animation-delay: ${delay}s">
+                                <span>${item.name}</span>
+                                <span class="slider-value">- ${item.options[currentValue]} -</span>
+                            </li>
+                        `;
+                    }
+                });
+
+                menuContent.innerHTML = html;
+                updateScrollIndicator();
+            }, 150);
         }
 
         function updateSelection() {
@@ -592,25 +608,35 @@
         window.addEventListener('message', function(event) {
             const data = event.data;
             
+            console.log('Received message:', data);
+            
             if (data.action === 'navigate') {
                 if (data.direction === 'up') {
-                    const maxIndex = document.querySelectorAll('[data-index]').length - 1;
+                    const items = document.querySelectorAll('[data-index]');
+                    const maxIndex = items.length - 1;
                     currentIndex = Math.max(0, currentIndex - 1);
                     updateSelection();
+                    console.log('Navigate UP - Index:', currentIndex);
                 } else if (data.direction === 'down') {
-                    const maxIndex = document.querySelectorAll('[data-index]').length - 1;
+                    const items = document.querySelectorAll('[data-index]');
+                    const maxIndex = items.length - 1;
                     currentIndex = Math.min(maxIndex, currentIndex + 1);
                     updateSelection();
+                    console.log('Navigate DOWN - Index:', currentIndex);
                 } else if (data.direction === 'left') {
                     handleLeft();
+                    console.log('Navigate LEFT');
                 } else if (data.direction === 'right') {
                     handleRight();
+                    console.log('Navigate RIGHT');
                 } else if (data.direction === 'enter') {
                     handleEnter();
+                    console.log('ENTER pressed');
                 } else if (data.direction === 'back') {
                     if (currentMenu !== 'main') {
                         renderMainMenu();
                         updateSelection();
+                        console.log('Going BACK to main menu');
                     }
                 }
             } else if (data.action === 'setState') {
