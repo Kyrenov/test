@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Avaris Menu</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        .menu-container {
+            width: 320px;
+            background: rgba(20, 20, 20, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.8);
+            position: relative;
+        }
+
+        /* Header with flag background */
+        .header {
+            background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6)), 
+                        url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 80"><rect fill="%23b22234" width="320" height="80"/><rect fill="%23fff" y="12" width="320" height="8"/><rect fill="%23fff" y="28" width="320" height="8"/><rect fill="%23fff" y="44" width="320" height="8"/><rect fill="%23fff" y="60" width="320" height="8"/><rect fill="%233c3b6e" width="130" height="44"/></svg>');
+            background-size: cover;
+            background-position: center;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 2px solid rgba(200, 0, 0, 0.5);
+            position: relative;
+        }
+
+        .logo-text {
+            font-size: 42px;
+            font-weight: bold;
+            color: #fff;
+            text-shadow: 
+                3px 3px 0px rgba(200, 0, 0, 0.8),
+                -1px -1px 0px rgba(0, 0, 0, 0.5),
+                0 0 20px rgba(255, 0, 0, 0.6);
+            letter-spacing: 3px;
+            transform: skewY(-2deg);
+        }
+
+        .menu-title {
+            background: rgba(40, 40, 40, 0.9);
+            padding: 10px 15px;
+            color: #fff;
+            font-size: 13px;
+            font-weight: 600;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .menu-items {
+            list-style: none;
+            max-height: 420px;
+            overflow-y: hidden;
+            background: rgba(30, 30, 30, 0.95);
+            position: relative;
+        }
+
+        .scroll-indicator {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 3px;
+            background: linear-gradient(180deg, rgba(200, 0, 0, 0.8) 0%, rgba(150, 0, 0, 0.8) 100%);
+            transition: all 0.2s ease;
+            box-shadow: 0 0 8px rgba(200, 0, 0, 0.6);
+        }
+
+        .menu-item {
+            padding: 11px 15px;
+            color: #bbb;
+            font-size: 14px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            background: rgba(40, 40, 40, 0.5);
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .menu-item.fade-out {
+            opacity: 0;
+            transform: translateX(-20px);
+        }
+
+        .menu-item.fade-in {
+            animation: fadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .menu-item:hover {
+            background: rgba(60, 60, 60, 0.7);
+            color: #fff;
+        }
+
+        .menu-item.selected {
+            background: linear-gradient(90deg, rgba(100, 100, 100, 0.6) 0%, rgba(70, 70, 70, 0.6) 100%);
+            color: #fff;
+            border-left: 3px solid #888;
+        }
+
+        .menu-item.has-submenu::after {
+            content: '›';
+            color: #888;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .menu-item.search::after {
+            content: '🔍';
+            font-size: 14px;
+            filter: grayscale(100%);
+        }
+
+        /* Toggle Switch (like the reference image) */
+        .toggle-switch {
+            width: 36px;
+            height: 18px;
+            background: rgba(100, 100, 100, 0.5);
+            border-radius: 12px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .toggle-switch.active {
+            background: linear-gradient(90deg, #ff4444 0%, #cc0000 100%);
+            box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            width: 14px;
+            height: 14px;
+            background: #fff;
+            border-radius: 50%;
+            top: 1px;
+            left: 2px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .toggle-switch.active::after {
+            left: 18px;
+        }
+
+        /* Slider */
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex: 1;
+        }
+
+        .slider {
+            flex: 1;
+            height: 4px;
+            background: rgba(100, 100, 100, 0.5);
+            border-radius: 2px;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .slider-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #666 0%, #999 100%);
+            border-radius: 2px;
+            transition: width 0.2s ease;
+        }
+
+        .slider-value {
+            color: #aaa;
+            font-size: 12px;
+            min-width: 50px;
+            text-align: right;
+        }
+
+        .submenu-item {
+            padding-left: 15px;
+            font-size: 13px;
+        }
+
+        .back-button {
+            background: rgba(60, 60, 60, 0.8);
+            border: none;
+            color: #fff;
+            padding: 11px 15px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 13px;
+            width: 100%;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .back-button:hover {
+            background: rgba(80, 80, 80, 0.8);
+        }
+
+        .back-button.selected {
+            background: linear-gradient(90deg, rgba(100, 100, 100, 0.6) 0%, rgba(70, 70, 70, 0.6) 100%);
+            border-left: 3px solid #888;
+        }
+
+        .footer {
+            padding: 8px 15px;
+            background: rgba(20, 20, 20, 0.95);
+            color: #888;
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .footer-icon {
+            width: 16px;
+            height: 16px;
+            background: rgba(200, 0, 0, 0.3);
+            border-radius: 3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            color: #ff6666;
+        }
+
+        .footer-text {
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+    <div class="menu-container">
+        <div class="header">
+            <div class="logo-text">AVARIS</div>
+        </div>
+
+        <div class="menu-title" id="menuTitle">Main menu</div>
+
+        <ul class="menu-items" id="menuContent">
+            <div class="scroll-indicator" id="scrollIndicator"></div>
+            <li class="menu-item has-submenu selected" data-index="0">Player</li>
+            <li class="menu-item has-submenu" data-index="1">Server</li>
+            <li class="menu-item has-submenu" data-index="2">Weapon</li>
+            <li class="menu-item has-submenu" data-index="3">Combat</li>
+            <li class="menu-item has-submenu" data-index="4">Vehicle</li>
+            <li class="menu-item has-submenu" data-index="5">Visual</li>
+            <li class="menu-item has-submenu" data-index="6">Miscellaneous</li>
+            <li class="menu-item has-submenu" data-index="7">Settings</li>
+            <li class="menu-item search" data-index="8">Search</li>
+        </ul>
+
+        <div class="footer">
+            <div class="footer-icon">⚠</div>
+            <span class="footer-text">680023 | 6d ago</span>
+        </div>
+    </div>
+
+    <script>
+        const submenus = {
+            player: {
+                title: 'Player',
+                items: [
+                    { name: 'Enable', type: 'toggle' },
+                    { name: 'Draw on orgs', type: 'toggle' },
+                    { name: 'Draw on yourself', type: 'toggle' },
+                    { name: 'Ignore dead', type: 'toggle' },
+                    { name: 'Distance', type: 'slider', min: 0, max: 100, value: 50 },
+                    { name: 'Full bright', type: 'toggle' },
+                    { name: 'Fox changer', type: 'toggle' }
+                ]
+            },
+            server: {
+                title: 'Server',
+                items: [
+                    { name: 'Show Player Names', type: 'toggle' },
+                    { name: 'Show Player IDs', type: 'toggle' },
+                    { name: 'Display Ping', type: 'toggle' },
+                    { name: 'Show Coordinates', type: 'toggle' }
+                ]
+            },
+            weapon: {
+                title: 'Weapon',
+                items: [
+                    { name: 'Infinite Ammo', type: 'toggle' },
+                    { name: 'No Reload', type: 'toggle' },
+                    { name: 'Rapid Fire', type: 'toggle' },
+                    { name: 'No Recoil', type: 'toggle' },
+                    { name: 'One Shot Kill', type: 'toggle' }
+                ]
+            },
+            combat: {
+                title: 'Combat',
+                items: [
+                    { name: 'Aimbot', type: 'toggle' },
+                    { name: 'ESP', type: 'toggle' },
+                    { name: 'Wallhack', type: 'toggle' },
+                    { name: 'Auto Heal', type: 'toggle' }
+                ]
+            },
+            vehicle: {
+                title: 'Vehicle',
+                items: [
+                    { name: 'God Mode Vehicle', type: 'toggle' },
+                    { name: 'Boost Speed', type: 'toggle' },
+                    { name: 'Rainbow Paint', type: 'toggle' },
+                    { name: 'Repair Vehicle', type: 'toggle' },
+                    { name: 'Flip Vehicle', type: 'toggle' }
+                ]
+            },
+            visual: {
+                title: 'Visual options',
+                items: [
+                    { name: 'Draw crosshair', type: 'list', options: ['Off', 'Classic', 'Modern'], value: 1 },
+                    { name: 'Crosshair size', type: 'slider', min: 1, max: 20, value: 10 },
+                    { name: 'Crosshair thickness', type: 'slider', min: 1, max: 10, value: 2 },
+                    { name: 'Night Vision', type: 'toggle' },
+                    { name: 'Thermal Vision', type: 'toggle' },
+                    { name: 'No HUD', type: 'toggle' },
+                    { name: 'Show FPS', type: 'toggle' }
+                ]
+            },
+            miscellaneous: {
+                title: 'Miscellaneous',
+                items: [
+                    { name: 'Teleport to Waypoint', type: 'toggle' },
+                    { name: 'Noclip', type: 'toggle' },
+                    { name: 'Freeze Time', type: 'toggle' },
+                    { name: 'Clear Wanted Level', type: 'toggle' },
+                    { name: 'Unlock All', type: 'toggle' }
+                ]
+            },
+            settings: {
+                title: 'Settings',
+                items: [
+                    { name: 'Show Notifications', type: 'toggle' },
+                    { name: 'Play Sound Effects', type: 'toggle' },
+                    { name: 'Auto Save Settings', type: 'toggle' },
+                    { name: 'Menu Opacity', type: 'slider', min: 0, max: 100, value: 95 }
+                ]
+            }
+        };
+
+        let currentMenu = 'main';
+        let currentIndex = 0;
+        let itemStates = {};
+
+        function renderMainMenu() {
+            currentMenu = 'main';
+            currentIndex = 0;
+            const menuContent = document.getElementById('menuContent');
+            const menuTitle = document.getElementById('menuTitle');
+
+            menuTitle.textContent = 'Main menu';
+
+            menuContent.innerHTML = `
+                <div class="scroll-indicator" id="scrollIndicator"></div>
+                <li class="menu-item has-submenu selected" data-index="0">Player</li>
+                <li class="menu-item has-submenu" data-index="1">Server</li>
+                <li class="menu-item has-submenu" data-index="2">Weapon</li>
+                <li class="menu-item has-submenu" data-index="3">Combat</li>
+                <li class="menu-item has-submenu" data-index="4">Vehicle</li>
+                <li class="menu-item has-submenu" data-index="5">Visual</li>
+                <li class="menu-item has-submenu" data-index="6">Miscellaneous</li>
+                <li class="menu-item has-submenu" data-index="7">Settings</li>
+                <li class="menu-item search" data-index="8">Search</li>
+            `;
+            updateScrollIndicator();
+        }
+
+        function renderSubmenu(menuName) {
+            const submenu = submenus[menuName];
+            if (!submenu) return;
+
+            currentMenu = menuName;
+            currentIndex = 0;
+            const menuContent = document.getElementById('menuContent');
+            const menuTitle = document.getElementById('menuTitle');
+
+            menuTitle.textContent = submenu.title;
+
+            let html = '<div class="scroll-indicator" id="scrollIndicator"></div>';
+            html += '<button class="back-button selected" data-index="0">← Back</button>';
+            
+            submenu.items.forEach((item, index) => {
+                const itemId = `${menuName}_${index}`;
+                const itemIndex = index + 1;
+                
+                if (item.type === 'toggle') {
+                    const isActive = itemStates[itemId] || false;
+                    html += `
+                        <li class="menu-item submenu-item" data-index="${itemIndex}" data-id="${itemId}">
+                            <span>${item.name}</span>
+                            <div class="toggle-switch ${isActive ? 'active' : ''}" id="${itemId}"></div>
+                        </li>
+                    `;
+                } else if (item.type === 'slider') {
+                    const value = itemStates[itemId] !== undefined ? itemStates[itemId] : item.value;
+                    const percentage = ((value - item.min) / (item.max - item.min)) * 100;
+                    html += `
+                        <li class="menu-item submenu-item" data-index="${itemIndex}" data-id="${itemId}">
+                            <span>${item.name}</span>
+                            <div class="slider-container">
+                                <div class="slider">
+                                    <div class="slider-fill" style="width: ${percentage}%"></div>
+                                </div>
+                                <span class="slider-value">${value}</span>
+                            </div>
+                        </li>
+                    `;
+                } else if (item.type === 'list') {
+                    const currentValue = itemStates[itemId] !== undefined ? itemStates[itemId] : item.value;
+                    html += `
+                        <li class="menu-item submenu-item" data-index="${itemIndex}" data-id="${itemId}">
+                            <span>${item.name}</span>
+                            <span class="slider-value">- ${item.options[currentValue]} -</span>
+                        </li>
+                    `;
+                }
+            });
+
+            menuContent.innerHTML = html;
+            updateScrollIndicator();
+        }
+
+        function updateSelection() {
+            const items = document.querySelectorAll('[data-index]');
+            items.forEach((item, idx) => {
+                if (parseInt(item.dataset.index) === currentIndex) {
+                    item.classList.add('selected');
+                } else {
+                    item.classList.remove('selected');
+                }
+            });
+            updateScrollIndicator();
+        }
+
+        function updateScrollIndicator() {
+            const scrollIndicator = document.getElementById('scrollIndicator');
+            const menuItems = document.getElementById('menuContent');
+            const items = document.querySelectorAll('[data-index]');
+            
+            if (!scrollIndicator || items.length === 0) return;
+            
+            const totalItems = items.length;
+            const menuHeight = menuItems.offsetHeight;
+            const indicatorHeight = menuHeight / totalItems;
+            const indicatorTop = currentIndex * indicatorHeight;
+            
+            scrollIndicator.style.height = indicatorHeight + 'px';
+            scrollIndicator.style.top = indicatorTop + 'px';
+        }
+
+        function handleEnter() {
+            if (currentMenu === 'main') {
+                const menuNames = ['player', 'server', 'weapon', 'combat', 'vehicle', 'visual', 'miscellaneous', 'settings'];
+                if (currentIndex < menuNames.length) {
+                    renderSubmenu(menuNames[currentIndex]);
+                }
+            } else {
+                if (currentIndex === 0) {
+                    renderMainMenu();
+                    return;
+                }
+
+                const items = document.querySelectorAll('[data-index]');
+                const selectedItem = Array.from(items).find(item => parseInt(item.dataset.index) === currentIndex);
+                
+                if (selectedItem && selectedItem.dataset.id) {
+                    const itemId = selectedItem.dataset.id;
+                    const toggle = selectedItem.querySelector('.toggle-switch');
+                    
+                    if (toggle) {
+                        itemStates[itemId] = !itemStates[itemId];
+                        toggle.classList.toggle('active');
+                        sendToFiveM('toggleChanged', { id: itemId, state: itemStates[itemId] });
+                    }
+                }
+            }
+        }
+
+        function handleLeft() {
+            if (currentMenu === 'main' || currentIndex === 0) return;
+
+            const items = document.querySelectorAll('[data-index]');
+            const selectedItem = Array.from(items).find(item => parseInt(item.dataset.index) === currentIndex);
+            
+            if (selectedItem && selectedItem.dataset.id) {
+                const itemId = selectedItem.dataset.id;
+                const menuName = currentMenu;
+                const itemIndex = currentIndex - 1;
+                const item = submenus[menuName].items[itemIndex];
+
+                if (item.type === 'slider') {
+                    const currentValue = itemStates[itemId] !== undefined ? itemStates[itemId] : item.value;
+                    const newValue = Math.max(item.min, currentValue - 1);
+                    itemStates[itemId] = newValue;
+                    
+                    const percentage = ((newValue - item.min) / (item.max - item.min)) * 100;
+                    selectedItem.querySelector('.slider-fill').style.width = percentage + '%';
+                    selectedItem.querySelector('.slider-value').textContent = newValue;
+                    
+                    sendToFiveM('sliderChanged', { id: itemId, value: newValue });
+                } else if (item.type === 'list') {
+                    const currentValue = itemStates[itemId] !== undefined ? itemStates[itemId] : item.value;
+                    const newValue = (currentValue - 1 + item.options.length) % item.options.length;
+                    itemStates[itemId] = newValue;
+                    
+                    selectedItem.querySelector('.slider-value').textContent = `- ${item.options[newValue]} -`;
+                    sendToFiveM('listChanged', { id: itemId, value: newValue, text: item.options[newValue] });
+                }
+            }
+        }
+
+        function handleRight() {
+            if (currentMenu === 'main' || currentIndex === 0) return;
+
+            const items = document.querySelectorAll('[data-index]');
+            const selectedItem = Array.from(items).find(item => parseInt(item.dataset.index) === currentIndex);
+            
+            if (selectedItem && selectedItem.dataset.id) {
+                const itemId = selectedItem.dataset.id;
+                const menuName = currentMenu;
+                const itemIndex = currentIndex - 1;
+                const item = submenus[menuName].items[itemIndex];
+
+                if (item.type === 'slider') {
+                    const currentValue = itemStates[itemId] !== undefined ? itemStates[itemId] : item.value;
+                    const newValue = Math.min(item.max, currentValue + 1);
+                    itemStates[itemId] = newValue;
+                    
+                    const percentage = ((newValue - item.min) / (item.max - item.min)) * 100;
+                    selectedItem.querySelector('.slider-fill').style.width = percentage + '%';
+                    selectedItem.querySelector('.slider-value').textContent = newValue;
+                    
+                    sendToFiveM('sliderChanged', { id: itemId, value: newValue });
+                } else if (item.type === 'list') {
+                    const currentValue = itemStates[itemId] !== undefined ? itemStates[itemId] : item.value;
+                    const newValue = (currentValue + 1) % item.options.length;
+                    itemStates[itemId] = newValue;
+                    
+                    selectedItem.querySelector('.slider-value').textContent = `- ${item.options[newValue]} -`;
+                    sendToFiveM('listChanged', { id: itemId, value: newValue, text: item.options[newValue] });
+                }
+            }
+        }
+
+        function sendToFiveM(eventName, data) {
+            if (window.invokeNative) {
+                fetch(`https://${GetParentResourceName()}/${eventName}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+            } else {
+                console.log('FiveM Event:', eventName, data);
+            }
+        }
+
+        // Message handler for Lua
+        window.addEventListener('message', function(event) {
+            const data = event.data;
+            
+            if (data.action === 'navigate') {
+                if (data.direction === 'up') {
+                    const maxIndex = document.querySelectorAll('[data-index]').length - 1;
+                    currentIndex = Math.max(0, currentIndex - 1);
+                    updateSelection();
+                } else if (data.direction === 'down') {
+                    const maxIndex = document.querySelectorAll('[data-index]').length - 1;
+                    currentIndex = Math.min(maxIndex, currentIndex + 1);
+                    updateSelection();
+                } else if (data.direction === 'left') {
+                    handleLeft();
+                } else if (data.direction === 'right') {
+                    handleRight();
+                } else if (data.direction === 'enter') {
+                    handleEnter();
+                } else if (data.direction === 'back') {
+                    if (currentMenu !== 'main') {
+                        renderMainMenu();
+                        updateSelection();
+                    }
+                }
+            } else if (data.action === 'setState') {
+                itemStates[data.id] = data.value;
+                const element = document.getElementById(data.id);
+                if (element && element.classList.contains('toggle-switch')) {
+                    if (data.value) {
+                        element.classList.add('active');
+                    } else {
+                        element.classList.remove('active');
+                    }
+                }
+            }
+        });
+
+        renderMainMenu();
+    </script>
+</body>
+</html>
