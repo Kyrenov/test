@@ -1,732 +1,460 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Avaris — Elite Menu (Redesign)</title>
-<style>
-  :root{
-    --bg:#07070b;
-    --panel:#0f1116;
-    --muted:#9aa1b3;
-    --accent-1:#4cc3ff;
-    --accent-2:#8b5cf6;
-    --glass: rgba(255,255,255,0.03);
-    --glass-2: rgba(255,255,255,0.02);
-    --red: #ff4d6d;
-  }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AVARIS Menu</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-  *{box-sizing:border-box;margin:0;padding:0}
-  html,body{height:100%}
-  body{
-    font-family: Inter, "Segoe UI", Roboto, system-ui, -apple-system, "Helvetica Neue", Arial;
-    background: linear-gradient(180deg, rgba(6,8,11,0.6), rgba(2,3,5,0.6));
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    padding:28px;
-  }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: transparent;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
 
-  /* Root container */
-  .menu-root{
-    width: 920px;
-    max-width: calc(100vw - 40px);
-    height: 560px;
-    display:grid;
-    grid-template-columns: 320px 1fr;
-    border-radius: 12px;
-    overflow: hidden;
-    background: linear-gradient(180deg, rgba(10,12,16,0.9), rgba(5,6,9,0.85));
-    box-shadow: 0 20px 60px rgba(3,6,12,0.9), 0 2px 8px rgba(0,0,0,0.6);
-    border: 1px solid rgba(255,255,255,0.03);
-  }
+        .menu-container {
+            width: 280px;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(8px);
+            border-radius: 6px;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
 
-  /* Left navigation */
-  .left {
-    padding: 18px;
-    background: linear-gradient(180deg, rgba(12,14,18,0.6), rgba(8,9,12,0.45));
-    display:flex;
-    flex-direction:column;
-    gap:12px;
-    position:relative;
-  }
+        .menu-header {
+            position: relative;
+            height: 80px;
+            overflow: hidden;
+            background: linear-gradient(to right, #1e3a8a 0%, #991b1b 50%, #991b1b 100%);
+        }
 
-  .brand {
-    display:flex;
-    gap:12px;
-    align-items:center;
-    user-select:none;
-  }
+        .flag-pattern {
+            position: absolute;
+            inset: 0;
+            opacity: 0.4;
+            background-image: 
+                repeating-linear-gradient(0deg, transparent, transparent 6px, rgba(255,255,255,0.15) 6px, rgba(255,255,255,0.15) 12px),
+                linear-gradient(to right, 
+                    #1e3a8a 0%, 
+                    #1e3a8a 35%, 
+                    transparent 35%,
+                    transparent 100%);
+        }
 
-  .logo {
-    width:56px;height:56px;border-radius:10px;
-    background: linear-gradient(135deg,var(--accent-1),var(--accent-2));
-    display:flex;align-items:center;justify-content:center;
-    color:rgba(10,10,12,0.02); font-weight:800; letter-spacing:1.8px;
-    box-shadow: 0 6px 22px rgba(139,92,246,0.18), inset 0 -6px 18px rgba(0,0,0,0.15);
-    transform: rotate(-6deg);
-    font-family:monospace;
-  }
+        .stars {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 35%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle, white 1px, transparent 1px);
+            background-size: 12px 10px;
+            opacity: 0.6;
+        }
 
-  .brand .title{
-    color:#eaf2ff;
-    font-size:18px;
-    font-weight:700;
-    line-height:1;
-  }
-  .brand .subtitle{
-    color:var(--muted);
-    font-size:12px;
-  }
+        .menu-title {
+            position: relative;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: Impact, sans-serif;
+            font-size: 42px;
+            font-weight: bold;
+            color: white;
+            letter-spacing: 0.05em;
+            text-shadow: 
+                2px 2px 0px rgba(0,0,0,0.8),
+                0 0 15px rgba(255,255,255,0.3);
+            user-select: none;
+            transform: skewY(-2deg);
+        }
 
-  .left-sep{
-    height:1px;background:var(--glass);margin:6px 0;border-radius:2px;
-  }
+        .menu-content {
+            padding: 8px;
+        }
 
-  .nav{
-    position:relative;
-    flex:1;
-    display:flex;
-    gap:8px;
-  }
+        .menu-label {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 11px;
+            margin-bottom: 6px;
+            padding: 0 8px;
+            font-weight: 500;
+        }
 
-  .nav-list{
-    width:100%;
-    overflow:hidden;
-    position:relative;
-  }
+        .menu-items {
+            position: relative;
+        }
 
-  .nav-list ul{ list-style:none; padding:4px 4px; max-height:420px; overflow:auto; }
-  .nav-list ul::-webkit-scrollbar{ width:8px }
-  .nav-list ul::-webkit-scrollbar-thumb{ background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02)); border-radius:6px }
+        .menu-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 12px;
+            margin-bottom: 2px;
+            background: rgba(255, 255, 255, 0.05);
+            cursor: pointer;
+            transition: all 0.15s;
+            color: rgba(255, 255, 255, 0.85);
+            font-size: 13px;
+        }
 
-  .nav-item{
-    display:flex; align-items:center; justify-content:space-between;
-    padding:10px 12px; gap:10px; border-radius:8px;
-    color:var(--muted); cursor:pointer; margin-bottom:6px;
-    transition: all .18s cubic-bezier(.2,.9,.2,1);
-    background: linear-gradient(180deg, rgba(255,255,255,0.012), rgba(255,255,255,0.01));
-    border:1px solid transparent;
-    backdrop-filter: blur(6px) saturate(120%);
-  }
+        .menu-item:hover,
+        .menu-item.selected {
+            background: rgba(220, 38, 38, 0.4);
+            color: white;
+        }
 
-  .nav-item .label{ font-weight:600 }
-  .nav-item .hint{ font-size:12px; color:rgba(160,170,190,0.7) }
+        .menu-item .arrow {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.5);
+        }
 
-  .nav-item:hover{
-    transform: translateX(6px);
-    color: #fff;
-    box-shadow: 0 8px 20px rgba(76,195,255,0.06);
-    border-color: rgba(76,195,255,0.08);
-  }
+        .menu-item.selected .arrow {
+            color: white;
+        }
 
-  .nav-item.active{
-    background: linear-gradient(90deg, rgba(76,195,255,0.08), rgba(139,92,246,0.06));
-    color: #fff;
-    border-left: 4px solid var(--accent-1);
-    transform: none;
-  }
+        .menu-footer {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 8px;
+            padding: 8px 12px;
+            background: rgba(0, 0, 0, 0.4);
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 11px;
+        }
 
-  /* scroll indicator on left column */
-  .left .scroll-indicator{
-    width:4px;
-    background: linear-gradient(180deg,var(--accent-1),var(--accent-2));
-    position:absolute;
-    left:8px;
-    top:82px;
-    border-radius:3px;
-    box-shadow: 0 6px 18px rgba(139,92,246,0.12);
-    transition: top .15s linear, height .15s linear;
-  }
+        .footer-icon {
+            width: 14px;
+            height: 14px;
+            background: rgba(220, 38, 38, 0.8);
+            border-radius: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            color: white;
+            font-weight: bold;
+        }
 
-  /* Right panel / submenu area */
-  .right{
-    padding:20px;
-    display:flex;
-    flex-direction:column;
-    gap:14px;
-  }
+        .scrollbar {
+            position: absolute;
+            right: 2px;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+        }
 
-  .panel-header{
-    display:flex; align-items:center; justify-content:space-between;
-  }
+        .scrollbar-thumb {
+            width: 100%;
+            background: rgba(220, 38, 38, 0.6);
+            border-radius: 2px;
+            transition: all 0.2s;
+        }
 
-  .panel-title{
-    color:#fff; font-size:20px; font-weight:700;
-    letter-spacing:0.6px;
-  }
-  .panel-sub{
-    color:var(--muted); font-size:13px;
-  }
+        .back-button {
+            color: #f87171;
+            cursor: pointer;
+            font-size: 13px;
+            transition: opacity 0.2s;
+            font-weight: 500;
+        }
 
-  .panel-body{
-    display:grid;
-    grid-template-columns: 1fr;
-    gap:12px;
-    background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.005));
-    border-radius:10px;
-    padding:14px;
-    height: calc(100% - 86px);
-    overflow:auto;
-  }
+        .back-button:hover {
+            opacity: 0.8;
+        }
 
-  /* submenu item */
-  .entry{
-    display:flex;align-items:center;justify-content:space-between;
-    padding:12px;border-radius:8px;
-    background: linear-gradient(180deg, rgba(0,0,0,0.25), rgba(255,255,255,0.01));
-    border:1px solid rgba(255,255,255,0.02);
-    color:var(--muted); transition: all .12s ease;
-  }
-  .entry:hover{ transform: translateY(-3px); color:#fff; box-shadow: 0 10px 30px rgba(10,12,16,0.7) }
+        .toggle-switch {
+            position: relative;
+            width: 36px;
+            height: 18px;
+            border-radius: 18px;
+            transition: all 0.3s;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
 
-  .entry .name{ font-weight:600 }
-  .entry .ctrl{ display:flex; gap:12px; align-items:center }
+        .toggle-switch.on {
+            background: #22c55e;
+        }
 
-  /* Toggle control */
-  .toggle {
-    width:42px; height:22px; border-radius:999px; padding:2px; cursor:pointer;
-    background: rgba(255,255,255,0.05); position:relative; transition: all .18s;
-    border:1px solid rgba(255,255,255,0.03);
-  }
-  .toggle .knob{
-    width:18px; height:18px; border-radius:50%; background:#fff; transform:translateX(0);
-    transition: transform .18s cubic-bezier(.2,.9,.2,1), box-shadow .18s;
-    box-shadow: 0 6px 14px rgba(0,0,0,0.35);
-  }
-  .toggle.on{ background: linear-gradient(90deg, var(--accent-1), var(--accent-2)); box-shadow: 0 6px 24px rgba(76,195,255,0.08) }
-  .toggle.on .knob{ transform: translateX(20px) }
+        .toggle-switch.off {
+            background: #dc2626;
+        }
 
-  /* Slider control */
-  .slider-wrap{ display:flex; align-items:center; gap:12px; min-width:220px; }
-  .slider-track{
-    height:8px; width:180px; background:rgba(255,255,255,0.03); border-radius:999px; position:relative; overflow:hidden;
-  }
-  .slider-fill{ height:100%; width:50%; background: linear-gradient(90deg,var(--accent-1),var(--accent-2)); border-radius:999px; transition: width .12s linear }
-  .slider-value{ min-width:38px; text-align:right; color:var(--muted); font-weight:700 }
+        .toggle-switch .thumb {
+            position: absolute;
+            top: 2px;
+            width: 14px;
+            height: 14px;
+            background: white;
+            border-radius: 50%;
+            transition: all 0.3s;
+        }
 
-  /* Button entry */
-  .btn{
-    padding:8px 12px;border-radius:8px;background:linear-gradient(90deg,var(--red),#b2002f); color:#fff;font-weight:700;
-    border: none; cursor: pointer; box-shadow: 0 8px 18px rgba(178,0,47,0.14);
-  }
+        .toggle-switch.off .thumb {
+            left: 2px;
+        }
 
-  /* small footer */
-  .meta{
-    display:flex; align-items:center; justify-content:space-between; color:var(--muted); font-size:13px;
-    padding-top:6px;
-  }
+        .toggle-switch.on .thumb {
+            left: 20px;
+        }
 
-  /* responsive small */
-  @media (max-width:980px){
-    .menu-root{ width: 96vw; grid-template-columns: 1fr; height: 760px; }
-    .left{ order:2 }
-    .right{ order:1; height: 420px }
-    .left .scroll-indicator{ left:6px; top:120px }
-  }
+        .menu-item .value {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 12px;
+        }
 
-  /* subtle animations */
-  .fade-in { animation: fadeIn .22s ease both }
-  @keyframes fadeIn { from{ opacity:0; transform: translateY(6px) } to{ opacity:1; transform:none } }
-</style>
+        .submenu-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 6px;
+            padding: 0 8px;
+        }
+
+        .submenu-title {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 11px;
+            font-weight: 500;
+            text-transform: capitalize;
+        }
+    </style>
 </head>
 <body>
-  <div class="menu-root" role="application" aria-label="Avaris Menu">
-    <!-- LEFT NAV -->
-    <div class="left" id="leftCol">
-      <div class="brand">
-        <div class="logo">AV</div>
-        <div>
-          <div class="title">Avaris</div>
-          <div class="subtitle">Elite · v1.0</div>
+    <div class="menu-container">
+        <div class="menu-header">
+            <div class="stars"></div>
+            <div class="flag-pattern"></div>
+            <div class="menu-title">AVARIS</div>
         </div>
-      </div>
 
-      <div class="left-sep" aria-hidden="true"></div>
-
-      <div class="nav">
-        <div class="nav-list" id="navList" tabindex="-1" role="listbox" aria-activedescendant="">
-          <ul id="navUl" role="list"></ul>
+        <div class="menu-content">
+            <div id="menuHeader"></div>
+            <div class="menu-items" id="menuItems"></div>
+            <div class="menu-footer">
+                <div class="footer-icon">A</div>
+                <span id="footerText">60023 | 6d ago</span>
+            </div>
         </div>
-        <div class="scroll-indicator" id="leftScroll"></div>
-      </div>
-
-      <div class="left-sep" aria-hidden="true"></div>
-
-      <div class="meta">
-        <div>680023</div>
-        <div class="subtitle">6d ago</div>
-      </div>
     </div>
 
-    <!-- RIGHT PANEL -->
-    <div class="right">
-      <div class="panel-header">
-        <div>
-          <div class="panel-title" id="panelTitle">Main menu</div>
-          <div class="panel-sub" id="panelSub">Use arrows / WASD — Enter to select — Esc to go back</div>
-        </div>
-        <div class="panel-actions">
-          <!-- reserved for future buttons -->
-        </div>
-      </div>
+    <script>
+        let currentMenu = 'main';
+        let selectedIndex = 0;
 
-      <div class="panel-body" id="panelBody" role="region" aria-live="polite"></div>
-    </div>
-  </div>
+        const menuData = {
+            main: [
+                { id: 'player', label: 'Player', hasSubmenu: true },
+                { id: 'server', label: 'Server', hasSubmenu: true },
+                { id: 'weapon', label: 'Weapon', hasSubmenu: true },
+                { id: 'combat', label: 'Combat', hasSubmenu: true },
+                { id: 'vehicle', label: 'Vehicle', hasSubmenu: true },
+                { id: 'visual', label: 'Visual', hasSubmenu: true },
+                { id: 'miscellaneous', label: 'Miscellaneous', hasSubmenu: true },
+                { id: 'settings', label: 'Settings', hasSubmenu: true },
+                { id: 'search', label: 'Search', hasSubmenu: false }
+            ],
+            player: [
+                { id: 'godMode', label: 'God mode', type: 'toggle', value: false },
+                { id: 'infiniteStamina', label: 'Infinite stamina', type: 'toggle', value: false },
+                { id: 'superJump', label: 'Super jump', type: 'toggle', value: false },
+                { id: 'fastRun', label: 'Fast run', type: 'toggle', value: false },
+                { id: 'noclip', label: 'Noclip', type: 'toggle', value: false },
+                { id: 'invisible', label: 'Invisible', type: 'toggle', value: false },
+                { id: 'noRagdoll', label: 'No ragdoll', type: 'toggle', value: false }
+            ],
+            server: [
+                { id: 'showCoords', label: 'Show coordinates', type: 'toggle', value: false },
+                { id: 'showFPS', label: 'Show FPS', type: 'toggle', value: false },
+                { id: 'showPing', label: 'Show ping', type: 'toggle', value: false },
+                { id: 'showPlayers', label: 'Show players', type: 'toggle', value: false },
+                { id: 'freezeTime', label: 'Freeze time', type: 'toggle', value: false }
+            ],
+            weapon: [
+                { id: 'infiniteAmmo', label: 'Infinite ammo', type: 'toggle', value: false },
+                { id: 'noReload', label: 'No reload', type: 'toggle', value: false },
+                { id: 'rapidFire', label: 'Rapid fire', type: 'toggle', value: false },
+                { id: 'oneShot', label: 'One shot kill', type: 'toggle', value: false },
+                { id: 'noRecoil', label: 'No recoil', type: 'toggle', value: false },
+                { id: 'aimbot', label: 'Aimbot', type: 'toggle', value: false }
+            ],
+            combat: [
+                { id: 'autoHeal', label: 'Auto heal', type: 'toggle', value: false },
+                { id: 'autoArmor', label: 'Auto armor', type: 'toggle', value: false },
+                { id: 'explosiveMelee', label: 'Explosive melee', type: 'toggle', value: false },
+                { id: 'fireMelee', label: 'Fire melee', type: 'toggle', value: false }
+            ],
+            vehicle: [
+                { id: 'godModeVeh', label: 'Vehicle god mode', type: 'toggle', value: false },
+                { id: 'seatbelt', label: 'Seatbelt', type: 'toggle', value: false },
+                { id: 'speedBoost', label: 'Speed boost', type: 'toggle', value: false },
+                { id: 'rainbow', label: 'Rainbow paint', type: 'toggle', value: false },
+                { id: 'noFallOff', label: 'No fall off bike', type: 'toggle', value: false }
+            ],
+            visual: [
+                { id: 'enable', label: 'Enable', type: 'toggle', value: true },
+                { id: 'drawOnNpcs', label: 'Draw on npcs', type: 'toggle', value: false },
+                { id: 'drawOnYourself', label: 'Draw on yourself', type: 'toggle', value: false },
+                { id: 'ignoreDead', label: 'Ignore dead', type: 'toggle', value: true },
+                { id: 'distance', label: 'Distance', type: 'toggle', value: true },
+                { id: 'fullBright', label: 'Full bright', type: 'toggle', value: false },
+                { id: 'foxChanger', label: 'Fox changer', type: 'toggle', value: false },
+                { id: 'drawCrosshair', label: 'Draw crosshair', type: 'toggle', value: true },
+                { id: 'crosshairStyle', label: 'Crosshair style', type: 'select', value: 'Classic' },
+                { id: 'crosshairSize', label: 'Crosshair size', type: 'slider', value: 50 },
+                { id: 'crosshairThickness', label: 'Crosshair thickness', type: 'slider', value: 50 }
+            ],
+            miscellaneous: [
+                { id: 'tpWaypoint', label: 'Teleport to waypoint', type: 'toggle', value: false },
+                { id: 'autoRevive', label: 'Auto revive', type: 'toggle', value: false },
+                { id: 'freecam', label: 'Freecam', type: 'toggle', value: false },
+                { id: 'spectateMode', label: 'Spectate mode', type: 'toggle', value: false }
+            ],
+            settings: [
+                { id: 'menuKey', label: 'Menu key', type: 'button', value: 'F5' },
+                { id: 'resetAll', label: 'Reset all settings', type: 'button', value: 'Reset' },
+                { id: 'saveConfig', label: 'Save configuration', type: 'button', value: 'Save' },
+                { id: 'loadConfig', label: 'Load configuration', type: 'button', value: 'Load' }
+            ]
+        };
 
-<script>
-/* ========= DATA ========= */
-const MENU = [
-  { key: 'player', label: 'Player', hint: 'Personal options' },
-  { key: 'server', label: 'Server', hint: 'Server toggles' },
-  { key: 'weapon', label: 'Weapon', hint: 'Guns & combat' },
-  { key: 'vehicle', label: 'Vehicle', hint: 'Vehicle utilities' },
-  { key: 'miscellaneous', label: 'Miscellaneous', hint: 'Odds & ends' },
-  { key: 'settings', label: 'Settings', hint: 'Interface' },
-  { key: 'search', label: 'Search', hint: 'Quick search' }
-];
+        function getCurrentItems() {
+            return menuData[currentMenu] || [];
+        }
 
-const SUBMENUS = {
-  player: {
-    title: 'Player',
-    items: [
-      { name: 'NoClip', type: 'toggle', id: 'player_noclip' },
-      { name: 'Noclip speed', type: 'slider', min:0, max:100, value:50, id:'player_noclip_speed' },
-      { name: 'Health Regen', type: 'toggle', id:'player_regen' }
-    ]
-  },
-  server: {
-    title: 'Server',
-    items: [
-      { name: 'Show Player Names', type: 'toggle', id:'server_names' },
-      { name: 'Show Player IDs', type: 'toggle', id:'server_ids' },
-      { name: 'Display Ping', type: 'toggle', id:'server_ping' },
-      { name: 'Show Coordinates', type: 'toggle', id:'server_coords' }
-    ]
-  },
-  weapon: {
-    title: 'Weapon',
-    items: [
-      { name: 'Infinite Ammo', type: 'toggle', id:'wp_infinite' },
-      { name: 'No Reload', type: 'toggle', id:'wp_noreload' },
-      { name: 'Rapid Fire', type: 'toggle', id:'wp_rapid' },
-      { name: 'No Recoil', type: 'toggle', id:'wp_norecoil' },
-      { name: 'One Shot Kill', type: 'toggle', id:'wp_oneshot' }
-    ]
-  },
-  vehicle: {
-    title: 'Vehicle',
-    items: [
-      { name: 'Boost Speed', type: 'toggle', id:'veh_boost' },
-      { name: 'Rainbow Paint', type: 'toggle', id:'veh_rainbow' },
-      { name: 'Repair Vehicle', type: 'button', id:'veh_repair' },
-      { name: 'Flip Vehicle', type: 'button', id:'veh_flip' }
-    ]
-  },
-  miscellaneous: {
-    title: 'Miscellaneous',
-    items: [
-      { name: 'Nuke Server', type: 'button', id:'misc_nuke' },
-    ]
-  },
-  settings: {
-    title: 'Settings',
-    items: [
-      { name: 'Menu Keybind', type: 'toggle', id:'set_keybind' },
-      { name: 'Animations Speed', type: 'slider', min:0, max:100, value:95, id:'set_anim_speed' }
-    ]
-  },
-  search: {
-    title: 'Search',
-    items: [
-      { name: 'Open quick search', type: 'button', id:'search_open' }
-    ]
-  }
-};
+        function toggleOption(id) {
+            const items = getCurrentItems();
+            const item = items.find(i => i.id === id);
+            if (item) {
+                item.value = !item.value;
+                render();
+            }
+        }
 
-/* ========= STATE ========= */
-let state = {
-  currentColumn: 'left', // 'left' or submenu key
-  leftIndex: 0,          // index in MENU array
-  submenuIndex: 0,       // index in submenu items (when in submenu)
-  values: {},            // persistent toggle/slider values keyed by id
-};
+        function renderScrollbar() {
+            const items = getCurrentItems();
+            if (items.length <= 8) return '';
+            
+            const scrollPercentage = selectedIndex / (items.length - 1);
+            const visibleRatio = 8 / items.length;
+            const thumbHeight = visibleRatio * 100;
+            const thumbPosition = scrollPercentage * (100 - thumbHeight);
+            
+            return `<div class="scrollbar">
+                <div class="scrollbar-thumb" style="height: ${thumbHeight}%; transform: translateY(${thumbPosition}%)"></div>
+            </div>`;
+        }
 
-/* helper: ensure leftIndex in range */
-function clampLeftIndex(i){ return Math.max(0, Math.min(MENU.length-1, i)); }
+        function render() {
+            const items = getCurrentItems();
+            const menuItemsDiv = document.getElementById('menuItems');
+            const menuHeader = document.getElementById('menuHeader');
+            
+            if (currentMenu === 'main') {
+                menuHeader.innerHTML = '<div class="menu-label">Main menu</div>';
+                
+                menuItemsDiv.innerHTML = items.map((item, index) => {
+                    const selected = index === selectedIndex ? 'selected' : '';
+                    const arrow = item.hasSubmenu ? '<span class="arrow">›</span>' : '';
+                    const searchIcon = item.id === 'search' ? '<span style="font-size: 14px;">🔍</span>' : '';
+                    
+                    return `<div class="menu-item ${selected}" onclick="selectItem(${index})">
+                        <span>${item.label}</span>
+                        ${arrow}${searchIcon}
+                    </div>`;
+                }).join('');
+            } else {
+                menuHeader.innerHTML = `<div class="submenu-header">
+                    <span class="back-button" onclick="goBack()">← Back</span>
+                    <span class="submenu-title">${currentMenu} options</span>
+                </div>`;
+                
+                const startIndex = Math.max(0, Math.min(selectedIndex - 4, items.length - 8));
+                const visibleItems = items.slice(startIndex, startIndex + 8);
+                
+                menuItemsDiv.innerHTML = visibleItems.map((item, index) => {
+                    const actualIndex = startIndex + index;
+                    const selected = actualIndex === selectedIndex ? 'selected' : '';
+                    let rightContent = '';
+                    
+                    if (item.type === 'toggle') {
+                        const toggleClass = item.value ? 'on' : 'off';
+                        rightContent = `<div class="toggle-switch ${toggleClass}" onclick="event.stopPropagation(); toggleOption('${item.id}')">
+                            <div class="thumb"></div>
+                        </div>`;
+                    } else if (item.type === 'select') {
+                        rightContent = `<span class="value">- ${item.value} ›</span>`;
+                    } else if (item.type === 'button') {
+                        rightContent = `<span class="value">${item.value}</span>`;
+                    }
+                    
+                    return `<div class="menu-item ${selected}" onclick="selectItem(${actualIndex})">
+                        <span>${item.label}</span>
+                        ${rightContent}
+                    </div>`;
+                }).join('') + renderScrollbar();
+            }
+        }
 
-/* ========= DOM REFS ========= */
-const navUl = document.getElementById('navUl');
-const leftScroll = document.getElementById('leftScroll');
-const panelTitle = document.getElementById('panelTitle');
-const panelSub = document.getElementById('panelSub');
-const panelBody = document.getElementById('panelBody');
-const leftCol = document.getElementById('leftCol');
+        function selectItem(index) {
+            selectedIndex = index;
+            const items = getCurrentItems();
+            const item = items[index];
+            
+            if (currentMenu === 'main' && item.hasSubmenu) {
+                currentMenu = item.id;
+                selectedIndex = 0;
+            } else if (item.type === 'toggle') {
+                toggleOption(item.id);
+            }
+            
+            render();
+        }
 
-/* ========= RENDER LEFT NAV ========= */
-function renderLeft(){
-  navUl.innerHTML = '';
-  MENU.forEach((m, idx) => {
-    const li = document.createElement('li');
-    li.className = 'nav-item fade-in' + (state.leftIndex === idx && state.currentColumn==='left' ? ' active' : '');
-    li.dataset.index = idx;
-    li.dataset.key = m.key;
-    li.setAttribute('role', 'option');
-    li.setAttribute('aria-selected', state.leftIndex===idx && state.currentColumn==='left');
-    li.innerHTML = `<div class="label">${m.label}</div><div class="hint">${m.hint}</div>`;
-    li.addEventListener('click', () => { state.leftIndex = idx; openSelected(); });
-    navUl.appendChild(li);
-  });
-  requestAnimationFrame(updateLeftScroll);
-}
+        function goBack() {
+            currentMenu = 'main';
+            selectedIndex = 0;
+            render();
+        }
 
-/* ========= LEFT SCROLL INDICATOR ========= */
-function updateLeftScroll(){
-  const list = navUl.querySelectorAll('.nav-item');
-  if(!list.length) return;
-  const containerHeight = leftCol.querySelector('.nav-list').offsetHeight;
-  const itemHeight = list[0].offsetHeight + 6; // include margin-bottom
-  const visibleCount = Math.floor(containerHeight / itemHeight);
-  const total = list.length;
-  const indicatorHeight = Math.max(32, (containerHeight / Math.max(total,1)));
-  const top = 82 + (state.leftIndex / Math.max(1,total-1)) * (containerHeight - indicatorHeight);
-  leftScroll.style.height = indicatorHeight + 'px';
-  leftScroll.style.top = top + 'px';
-  // scroll the list to show selection if needed
-  const targetLi = navUl.querySelector(`[data-index="${state.leftIndex}"]`);
-  if(targetLi){
-    const parent = navUl.parentElement;
-    const parentRect = parent.getBoundingClientRect();
-    const childRect = targetLi.getBoundingClientRect();
-    if(childRect.top < parentRect.top){
-      parent.scrollTop -= (parentRect.top - childRect.top) + 8;
-    } else if(childRect.bottom > parentRect.bottom){
-      parent.scrollTop += (childRect.bottom - parentRect.bottom) + 8;
-    }
-  }
-}
+        document.addEventListener('keydown', (e) => {
+            const items = getCurrentItems();
+            
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                selectedIndex = (selectedIndex + 1) % items.length;
+                render();
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                selectedIndex = (selectedIndex - 1 + items.length) % items.length;
+                render();
+            } else if (e.key === 'Enter') {
+                e.preventDefault();
+                selectItem(selectedIndex);
+            } else if (e.key === 'Backspace') {
+                e.preventDefault();
+                if (currentMenu !== 'main') {
+                    goBack();
+                }
+            }
+        });
 
-/* ========= OPEN SELECTED ========= */
-function openSelected(){
-  const selected = MENU[state.leftIndex];
-  if(!selected) return;
-  if(selected.key === 'search'){
-    // open search UI (simple built-in)
-    openSubmenu('search');
-  } else {
-    openSubmenu(selected.key);
-  }
-}
-
-/* ========= RENDER SUBMENU ========= */
-function openSubmenu(key){
-  const submenu = SUBMENUS[key];
-  if(!submenu) return;
-  state.currentColumn = key;
-  state.submenuIndex = 0;
-  panelTitle.textContent = submenu.title || 'Menu';
-  panelSub.textContent = 'Use Left to go back';
-  // build items
-  panelBody.innerHTML = '';
-  submenu.items.forEach((item, idx) => {
-    const entry = document.createElement('div');
-    entry.className = 'entry fade-in';
-    entry.dataset.idx = idx;
-    entry.dataset.id = item.id || (key + '_' + idx);
-    entry.innerHTML = `<div class="name">${item.name}</div>`;
-    const ctrl = document.createElement('div');
-    ctrl.className = 'ctrl';
-
-    if(item.type === 'toggle'){
-      const t = document.createElement('div');
-      t.className = 'toggle ' + (state.values[item.id] ? 'on' : '');
-      t.tabIndex = 0;
-      t.innerHTML = '<div class="knob"></div>';
-      t.addEventListener('click', () => toggleItem(item.id));
-      ctrl.appendChild(t);
-    } else if(item.type === 'slider'){
-      const wrap = document.createElement('div');
-      wrap.className = 'slider-wrap';
-      const track = document.createElement('div');
-      track.className = 'slider-track';
-      const fill = document.createElement('div');
-      fill.className = 'slider-fill';
-      const val = state.values[item.id] !== undefined ? state.values[item.id] : item.value;
-      const pct = percentFor(val,item.min,item.max);
-      fill.style.width = pct + '%';
-      track.appendChild(fill);
-      const valSpan = document.createElement('div');
-      valSpan.className = 'slider-value';
-      valSpan.textContent = String(val);
-      wrap.appendChild(track);
-      wrap.appendChild(valSpan);
-      // click to change
-      track.addEventListener('click', (ev)=> {
-        const rect = track.getBoundingClientRect();
-        const x = ev.clientX - rect.left;
-        const newPct = Math.max(0, Math.min(1, x / rect.width));
-        const newValue = Math.round(item.min + newPct * (item.max - item.min));
-        setValue(item.id, newValue);
-        fill.style.width = percentFor(newValue,item.min,item.max) + '%';
-        valSpan.textContent = String(newValue);
-      });
-      ctrl.appendChild(wrap);
-    } else if(item.type === 'button'){
-      const btn = document.createElement('button');
-      btn.className = 'btn';
-      btn.textContent = item.name;
-      btn.addEventListener('click', ()=> activateButton(item.id));
-      ctrl.appendChild(btn);
-    } else {
-      // generic label
-      const span = document.createElement('div');
-      span.className = 'subtitle';
-      span.textContent = item.name;
-      ctrl.appendChild(span);
-    }
-
-    entry.appendChild(ctrl);
-    entry.addEventListener('click', ()=> { state.submenuIndex = idx; activateSubmenuItem(key, idx); });
-    panelBody.appendChild(entry);
-  });
-
-  // focus first entry visually
-  highlightSubmenu();
-}
-
-/* ========= UTILITIES ========= */
-function percentFor(value,min,max){
-  if(max === undefined || min === undefined) return 0;
-  return Math.round(((value - min) / (max - min)) * 100);
-}
-
-function setValue(id, value){
-  state.values[id] = value;
-  sendToFiveM('setState', { id, value });
-}
-
-function toggleItem(id){
-  const newVal = !state.values[id];
-  state.values[id] = newVal;
-  // update DOM toggle visual
-  const el = panelBody.querySelector(`[data-id="${id}"] .toggle`);
-  if(el) el.classList.toggle('on', !!newVal);
-  sendToFiveM('toggleChanged', { id, state: newVal });
-}
-
-/* button action */
-function activateButton(id){
-  sendToFiveM('buttonPressed', { id });
-  // small visual feedback
-  const el = panelBody.querySelector(`[data-id="${id}"]`);
-  if(el){
-    el.style.transform = 'scale(.995)';
-    setTimeout(()=> el.style.transform = '', 120);
-  }
-}
-
-/* activate submenu item when pressing enter */
-function activateSubmenuItem(key, idx){
-  const submenu = SUBMENUS[key];
-  if(!submenu) return;
-  const item = submenu.items[idx];
-  if(!item) return;
-  if(item.type === 'toggle'){
-    toggleItem(item.id);
-  } else if(item.type === 'slider'){
-    // increase slider as default action
-    const cur = state.values[item.id] !== undefined ? state.values[item.id] : item.value;
-    const next = Math.min(item.max, cur + 1);
-    setValue(item.id, next);
-    // update visuals
-    const container = panelBody.querySelector(`[data-idx="${idx}"]`);
-    if(container){
-      const fill = container.querySelector('.slider-fill');
-      const valSpan = container.querySelector('.slider-value');
-      if(fill) fill.style.width = percentFor(next,item.min,item.max)+'%';
-      if(valSpan) valSpan.textContent = String(next);
-    }
-  } else if(item.type === 'button'){
-    activateButton(item.id);
-  }
-}
-
-/* highlight submenu selection */
-function highlightSubmenu(){
-  // clear all
-  panelBody.querySelectorAll('.entry').forEach((el,i)=> {
-    el.style.border = '1px solid rgba(255,255,255,0.02)';
-    el.style.opacity = '1';
-    el.classList.remove('focused');
-  });
-  const selected = panelBody.querySelector(`[data-idx="${state.submenuIndex}"]`);
-  if(selected){
-    selected.style.border = '1px solid rgba(76,195,255,0.18)';
-    selected.style.boxShadow = '0 12px 36px rgba(76,195,255,0.04)';
-    selected.scrollIntoView({ block:'nearest', behavior:'smooth' });
-  }
-}
-
-/* update left active visual */
-function updateLeftActive(){
-  navUl.querySelectorAll('.nav-item').forEach(li => {
-    li.classList.remove('active');
-    const idx = Number(li.dataset.index);
-    if(idx === state.leftIndex && state.currentColumn === 'left') li.classList.add('active');
-  });
-  updateLeftScroll();
-}
-
-/* close submenu -> back to left nav */
-function backToLeft(){
-  state.currentColumn = 'left';
-  panelTitle.textContent = 'Main menu';
-  panelSub.textContent = 'Use arrows / WASD — Enter to select — Esc to go back';
-  panelBody.innerHTML = `<div style="opacity:.6;color:${getComputedStyle(document.documentElement).getPropertyValue('--muted')};padding:12px">Select a category from the left.</div>`;
-  updateLeftActive();
-}
-
-/* ========= NAVIGATION HANDLERS ========= */
-function navUp(){
-  if(state.currentColumn === 'left'){
-    state.leftIndex = clampLeftIndex(state.leftIndex - 1);
-    renderLeft(); updateLeftActive();
-  } else {
-    // in submenu
-    state.submenuIndex = Math.max(0, state.submenuIndex - 1);
-    highlightSubmenu();
-  }
-}
-function navDown(){
-  if(state.currentColumn === 'left'){
-    state.leftIndex = clampLeftIndex(state.leftIndex + 1);
-    renderLeft(); updateLeftActive();
-  } else {
-    // in submenu
-    const max = panelBody.querySelectorAll('.entry').length - 1;
-    state.submenuIndex = Math.min(max, state.submenuIndex + 1);
-    highlightSubmenu();
-  }
-}
-function navLeft(){
-  if(state.currentColumn === 'left') return;
-  // back to left
-  backToLeft();
-}
-function navRight(){
-  if(state.currentColumn === 'left'){
-    openSelected();
-    updateLeftActive();
-  } else {
-    // maybe open deeper? for now no deeper panels — treat as enter
-    activateSubmenuItem(state.currentColumn, state.submenuIndex);
-  }
-}
-function navEnter(){
-  if(state.currentColumn === 'left'){
-    openSelected();
-  } else {
-    activateSubmenuItem(state.currentColumn, state.submenuIndex);
-  }
-}
-function navBack(){
-  if(state.currentColumn !== 'left'){
-    backToLeft();
-  } else {
-    // if already in left - maybe close menu; we just print
-    sendToFiveM('menuClose', {});
-  }
-}
-
-/* keyboard listener */
-window.addEventListener('keydown', (e)=>{
-  const key = e.key.toLowerCase();
-  if(['arrowup','w'].includes(e.key.toLowerCase()) || key === 'w') { e.preventDefault(); navUp(); }
-  else if(['arrowdown','s'].includes(e.key.toLowerCase()) || key === 's') { e.preventDefault(); navDown(); }
-  else if(['arrowleft','a','escape','backspace'].includes(e.key.toLowerCase()) || key === 'a') { e.preventDefault(); navLeft(); }
-  else if(['arrowright','d'].includes(e.key.toLowerCase()) || key === 'd') { e.preventDefault(); navRight(); }
-  else if(e.key === 'Enter') { e.preventDefault(); navEnter(); }
-  else if(e.key === 'Escape') { e.preventDefault(); navBack(); }
-});
-
-/* ========= external message handler (FiveM) =========
- Supports:
-  { action: 'navigate', direction: 'up'|'down'|'left'|'right'|'enter'|'back' }
-  { action: 'setState', id: 'xxx', value: ... }
-*/
-window.addEventListener('message', (ev)=>{
-  const data = ev.data || {};
-  if(data.action === 'navigate'){
-    if(data.direction === 'up') navUp();
-    else if(data.direction === 'down') navDown();
-    else if(data.direction === 'left') navLeft();
-    else if(data.direction === 'right') navRight();
-    else if(data.direction === 'enter') navEnter();
-    else if(data.direction === 'back') navBack();
-    return;
-  }
-  if(data.action === 'setState' && data.id!==undefined){
-    state.values[data.id] = data.value;
-    // update UI if present
-    const toggle = panelBody.querySelector(`[data-id="${data.id}"] .toggle`);
-    if(toggle) toggle.classList.toggle('on', !!data.value);
-    const fill = panelBody.querySelector(`[data-id="${data.id}"] .slider-fill`);
-    const entry = findItemById(data.id);
-    if(fill && entry){
-      const pct = percentFor(data.value, entry.min, entry.max);
-      fill.style.width = pct + '%';
-      const valSpan = panelBody.querySelector(`[data-id="${data.id}"] .slider-value`);
-      if(valSpan) valSpan.textContent = String(data.value);
-    }
-  }
-});
-
-/* helper: find item def by id in SUBMENUS */
-function findItemById(id){
-  for(const k in SUBMENUS){
-    for(const it of (SUBMENUS[k].items || [])){
-      if(it.id === id) return it;
-    }
-  }
-  return null;
-}
-
-/* FiveM send wrapper - compatible with DUI (POST) or fallback console.log */
-function sendToFiveM(eventName, data = {}){
-  try {
-    // in FiveM, you usually POST to https://<resourceName>/<eventName>
-    if(window.invokeNative || typeof window.fetch === 'function' && typeof GetParentResourceName === 'function'){
-      fetch(`https://${GetParentResourceName()}/${eventName}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json; charset=utf-8' },
-        body: JSON.stringify(data)
-      }).catch(e => console.log('sendToFiveM fetch error', e));
-    } else {
-      // not in FiveM environment: log
-      console.log('FiveM Event:', eventName, data);
-    }
-  } catch(err){
-    console.log('sendToFiveM fallback', eventName, data, err);
-  }
-}
-
-/* ========= INIT ========= */
-function init(){
-  // render left items
-  renderLeft();
-  // initial panel content
-  panelBody.innerHTML = `<div style="opacity:.7;color:var(--muted);padding:12px">Welcome. Select a category on the left to begin.</div>`;
-  updateLeftActive();
-  // give a small entrance animation
-  document.querySelectorAll('.fade-in').forEach((el, i)=> el.style.animationDelay = (i*12)+'ms');
-}
-
-/* ========= accessibility helpers: focus visuals when clicking left menu items ====== */
-navUl.addEventListener('focusin', ()=> updateLeftActive());
-
-/* run it */
-init();
-</script>
+        // Initialize
+        render();
+    </script>
 </body>
 </html>
