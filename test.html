@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Avaris — Elite Menu (Redesign)</title>
+<title>Avaris — Elite Menu (Redesign, Slide Submenu)</title>
 <style>
   :root{
-    --bg:#07070b;
+    --bg:#06060a;
     --panel:#0f1116;
     --muted:#9aa1b3;
     --accent-1:#4cc3ff;
@@ -16,11 +16,14 @@
     --red: #ff4d6d;
   }
 
+  /* Reset */
   *{box-sizing:border-box;margin:0;padding:0}
   html,body{height:100%}
   body{
     font-family: Inter, "Segoe UI", Roboto, system-ui, -apple-system, "Helvetica Neue", Arial;
-    background: linear-gradient(180deg, rgba(6,8,11,0.6), rgba(2,3,5,0.6));
+    background: radial-gradient(1200px 600px at 10% 10%, rgba(76,195,255,0.03), transparent 6%),
+                radial-gradient(800px 400px at 90% 90%, rgba(139,92,246,0.02), transparent 6%),
+                linear-gradient(180deg, rgba(6,8,11,0.6), rgba(2,3,5,0.6));
     display:flex;
     align-items:center;
     justify-content:center;
@@ -36,12 +39,12 @@
     grid-template-columns: 320px 1fr;
     border-radius: 12px;
     overflow: hidden;
-    background: linear-gradient(180deg, rgba(10,12,16,0.9), rgba(5,6,9,0.85));
+    background: linear-gradient(180deg, rgba(10,12,16,0.95), rgba(5,6,9,0.92));
     box-shadow: 0 20px 60px rgba(3,6,12,0.9), 0 2px 8px rgba(0,0,0,0.6);
     border: 1px solid rgba(255,255,255,0.03);
   }
 
-  /* Left navigation */
+  /* LEFT NAV */
   .left {
     padding: 18px;
     background: linear-gradient(180deg, rgba(12,14,18,0.6), rgba(8,9,12,0.45));
@@ -51,51 +54,18 @@
     position:relative;
   }
 
-  .brand {
-    display:flex;
-    gap:12px;
-    align-items:center;
-    user-select:none;
-  }
-
-  .logo {
-    width:56px;height:56px;border-radius:10px;
+  .brand { display:flex; gap:12px; align-items:center; user-select:none; }
+  .logo { width:56px;height:56px;border-radius:10px;
     background: linear-gradient(135deg,var(--accent-1),var(--accent-2));
-    display:flex;align-items:center;justify-content:center;
-    color:rgba(10,10,12,0.02); font-weight:800; letter-spacing:1.8px;
-    box-shadow: 0 6px 22px rgba(139,92,246,0.18), inset 0 -6px 18px rgba(0,0,0,0.15);
-    transform: rotate(-6deg);
-    font-family:monospace;
-  }
+    display:flex;align-items:center;justify-content:center; color:rgba(10,10,12,0.02);
+    font-weight:800; letter-spacing:1.6px; transform: rotate(-6deg); font-family:monospace; }
+  .title{ color:#eaf2ff; font-size:18px; font-weight:700 }
+  .subtitle{ color:var(--muted); font-size:12px }
 
-  .brand .title{
-    color:#eaf2ff;
-    font-size:18px;
-    font-weight:700;
-    line-height:1;
-  }
-  .brand .subtitle{
-    color:var(--muted);
-    font-size:12px;
-  }
+  .left-sep{ height:1px;background:var(--glass);margin:6px 0;border-radius:2px }
 
-  .left-sep{
-    height:1px;background:var(--glass);margin:6px 0;border-radius:2px;
-  }
-
-  .nav{
-    position:relative;
-    flex:1;
-    display:flex;
-    gap:8px;
-  }
-
-  .nav-list{
-    width:100%;
-    overflow:hidden;
-    position:relative;
-  }
-
+  .nav{ position:relative; flex:1; display:flex; gap:8px; }
+  .nav-list{ width:100%; overflow:hidden; position:relative; }
   .nav-list ul{ list-style:none; padding:4px 4px; max-height:420px; overflow:auto; }
   .nav-list ul::-webkit-scrollbar{ width:8px }
   .nav-list ul::-webkit-scrollbar-thumb{ background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02)); border-radius:6px }
@@ -109,22 +79,13 @@
     border:1px solid transparent;
     backdrop-filter: blur(6px) saturate(120%);
   }
-
   .nav-item .label{ font-weight:600 }
-  .nav-item .hint{ font-size:12px; color:rgba(160,170,190,0.7) }
+  .nav-item .hint{ font-size:12px; color:rgba(160,170,190,0.72) }
 
-  .nav-item:hover{
-    transform: translateX(6px);
-    color: #fff;
-    box-shadow: 0 8px 20px rgba(76,195,255,0.06);
-    border-color: rgba(76,195,255,0.08);
-  }
-
+  .nav-item:hover{ transform: translateX(6px); color:#fff; box-shadow: 0 8px 20px rgba(76,195,255,0.06); border-color: rgba(76,195,255,0.08) }
   .nav-item.active{
     background: linear-gradient(90deg, rgba(76,195,255,0.08), rgba(139,92,246,0.06));
-    color: #fff;
-    border-left: 4px solid var(--accent-1);
-    transform: none;
+    color:#fff; border-left:4px solid var(--accent-1); transform:none;
   }
 
   /* scroll indicator on left column */
@@ -139,38 +100,53 @@
     transition: top .15s linear, height .15s linear;
   }
 
-  /* Right panel / submenu area */
-  .right{
-    padding:20px;
+  /* RIGHT PANEL */
+  .right{ padding:20px; display:flex; flex-direction:column; gap:14px; position:relative; overflow:hidden }
+
+  .panel-header{ display:flex; align-items:center; justify-content:space-between }
+  .panel-title{ color:#fff; font-size:20px; font-weight:700; letter-spacing:0.6px }
+  .panel-sub{ color:var(--muted); font-size:13px }
+
+  /* panel-body has sliding container to animate submenu coming in */
+  .panel-body{
+    position:relative;
+    height: calc(100% - 86px);
+    overflow:hidden;
+    border-radius:10px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.005));
+    padding:0;
+  }
+
+  .panel-inner{
+    position:absolute;
+    inset:0;
+    padding:14px;
+    overflow:auto;
     display:flex;
     flex-direction:column;
-    gap:14px;
-  }
-
-  .panel-header{
-    display:flex; align-items:center; justify-content:space-between;
-  }
-
-  .panel-title{
-    color:#fff; font-size:20px; font-weight:700;
-    letter-spacing:0.6px;
-  }
-  .panel-sub{
-    color:var(--muted); font-size:13px;
-  }
-
-  .panel-body{
-    display:grid;
-    grid-template-columns: 1fr;
     gap:12px;
-    background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.005));
-    border-radius:10px;
-    padding:14px;
-    height: calc(100% - 86px);
-    overflow:auto;
+    transition: transform 260ms cubic-bezier(.22,.9,.2,1), opacity 200ms ease;
+    will-change: transform, opacity;
+    background: linear-gradient(180deg, rgba(0,0,0,0.02), rgba(255,255,255,0.002));
   }
 
-  /* submenu item */
+  .panel-inner.enter {
+    transform: translateX(14px);
+    opacity: 0;
+  }
+  .panel-inner.enter-active {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  .panel-inner.exit {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  .panel-inner.exit-active {
+    transform: translateX(14px);
+    opacity: 0;
+  }
+
   .entry{
     display:flex;align-items:center;justify-content:space-between;
     padding:12px;border-radius:8px;
@@ -179,45 +155,25 @@
     color:var(--muted); transition: all .12s ease;
   }
   .entry:hover{ transform: translateY(-3px); color:#fff; box-shadow: 0 10px 30px rgba(10,12,16,0.7) }
-
   .entry .name{ font-weight:600 }
   .entry .ctrl{ display:flex; gap:12px; align-items:center }
 
-  /* Toggle control */
-  .toggle {
-    width:42px; height:22px; border-radius:999px; padding:2px; cursor:pointer;
-    background: rgba(255,255,255,0.05); position:relative; transition: all .18s;
-    border:1px solid rgba(255,255,255,0.03);
-  }
-  .toggle .knob{
-    width:18px; height:18px; border-radius:50%; background:#fff; transform:translateX(0);
-    transition: transform .18s cubic-bezier(.2,.9,.2,1), box-shadow .18s;
-    box-shadow: 0 6px 14px rgba(0,0,0,0.35);
-  }
+  /* Toggle */
+  .toggle{ width:42px; height:22px; border-radius:999px; padding:2px; cursor:pointer; background: rgba(255,255,255,0.05); position:relative; transition: all .18s; border:1px solid rgba(255,255,255,0.03); }
+  .toggle .knob{ width:18px; height:18px; border-radius:50%; background:#fff; transform:translateX(0); transition: transform .18s cubic-bezier(.2,.9,.2,1), box-shadow .18s; box-shadow: 0 6px 14px rgba(0,0,0,0.35) }
   .toggle.on{ background: linear-gradient(90deg, var(--accent-1), var(--accent-2)); box-shadow: 0 6px 24px rgba(76,195,255,0.08) }
   .toggle.on .knob{ transform: translateX(20px) }
 
-  /* Slider control */
+  /* Slider */
   .slider-wrap{ display:flex; align-items:center; gap:12px; min-width:220px; }
-  .slider-track{
-    height:8px; width:180px; background:rgba(255,255,255,0.03); border-radius:999px; position:relative; overflow:hidden;
-  }
+  .slider-track{ height:8px; width:180px; background:rgba(255,255,255,0.03); border-radius:999px; position:relative; overflow:hidden; cursor:pointer; }
   .slider-fill{ height:100%; width:50%; background: linear-gradient(90deg,var(--accent-1),var(--accent-2)); border-radius:999px; transition: width .12s linear }
   .slider-value{ min-width:38px; text-align:right; color:var(--muted); font-weight:700 }
 
-  /* Button entry */
-  .btn{
-    padding:8px 12px;border-radius:8px;background:linear-gradient(90deg,var(--red),#b2002f); color:#fff;font-weight:700;
-    border: none; cursor: pointer; box-shadow: 0 8px 18px rgba(178,0,47,0.14);
-  }
+  .btn{ padding:8px 12px;border-radius:8px;background:linear-gradient(90deg,var(--red),#b2002f); color:#fff;font-weight:700; border:none; cursor:pointer; box-shadow: 0 8px 18px rgba(178,0,47,0.14) }
 
-  /* small footer */
-  .meta{
-    display:flex; align-items:center; justify-content:space-between; color:var(--muted); font-size:13px;
-    padding-top:6px;
-  }
+  .meta{ display:flex; align-items:center; justify-content:space-between; color:var(--muted); font-size:13px; padding-top:6px; }
 
-  /* responsive small */
   @media (max-width:980px){
     .menu-root{ width: 96vw; grid-template-columns: 1fr; height: 760px; }
     .left{ order:2 }
@@ -228,6 +184,11 @@
   /* subtle animations */
   .fade-in { animation: fadeIn .22s ease both }
   @keyframes fadeIn { from{ opacity:0; transform: translateY(6px) } to{ opacity:1; transform:none } }
+
+  /* Focus styles for keyboard */
+  .nav-item[aria-selected="true"]{ outline: 2px solid rgba(76,195,255,0.08); outline-offset: 2px }
+  .entry[aria-selected="true"]{ outline: 2px solid rgba(76,195,255,0.06); outline-offset: 2px }
+
 </style>
 </head>
 <body>
@@ -248,7 +209,7 @@
         <div class="nav-list" id="navList" tabindex="-1" role="listbox" aria-activedescendant="">
           <ul id="navUl" role="list"></ul>
         </div>
-        <div class="scroll-indicator" id="leftScroll"></div>
+        <div class="scroll-indicator" id="leftScroll" aria-hidden="true"></div>
       </div>
 
       <div class="left-sep" aria-hidden="true"></div>
@@ -264,14 +225,14 @@
       <div class="panel-header">
         <div>
           <div class="panel-title" id="panelTitle">Main menu</div>
-          <div class="panel-sub" id="panelSub">Use arrows / WASD — Enter to select — Esc to go back</div>
+          <div class="panel-sub" id="panelSub">Use arrows / WASD — Enter to select — Backspace to go back</div>
         </div>
-        <div class="panel-actions">
-          <!-- reserved for future buttons -->
-        </div>
+        <div class="panel-actions"></div>
       </div>
 
-      <div class="panel-body" id="panelBody" role="region" aria-live="polite"></div>
+      <div class="panel-body" id="panelBody" role="region" aria-live="polite">
+        <!-- dynamic inner content inserted here -->
+      </div>
     </div>
   </div>
 
@@ -353,7 +314,6 @@ let state = {
   values: {},            // persistent toggle/slider values keyed by id
 };
 
-/* helper: ensure leftIndex in range */
 function clampLeftIndex(i){ return Math.max(0, Math.min(MENU.length-1, i)); }
 
 /* ========= DOM REFS ========= */
@@ -363,13 +323,14 @@ const panelTitle = document.getElementById('panelTitle');
 const panelSub = document.getElementById('panelSub');
 const panelBody = document.getElementById('panelBody');
 const leftCol = document.getElementById('leftCol');
+const navList = document.getElementById('navList');
 
 /* ========= RENDER LEFT NAV ========= */
 function renderLeft(){
   navUl.innerHTML = '';
   MENU.forEach((m, idx) => {
     const li = document.createElement('li');
-    li.className = 'nav-item fade-in' + (state.leftIndex === idx && state.currentColumn==='left' ? ' active' : '');
+    li.className = 'nav-item fade-in';
     li.dataset.index = idx;
     li.dataset.key = m.key;
     li.setAttribute('role', 'option');
@@ -378,45 +339,60 @@ function renderLeft(){
     li.addEventListener('click', () => { state.leftIndex = idx; openSelected(); });
     navUl.appendChild(li);
   });
+  updateLeftActive();
   requestAnimationFrame(updateLeftScroll);
 }
 
 /* ========= LEFT SCROLL INDICATOR ========= */
 function updateLeftScroll(){
-  const list = navUl.querySelectorAll('.nav-item');
-  if(!list.length) return;
-  const containerHeight = leftCol.querySelector('.nav-list').offsetHeight;
-  const itemHeight = list[0].offsetHeight + 6; // include margin-bottom
-  const visibleCount = Math.floor(containerHeight / itemHeight);
-  const total = list.length;
-  const indicatorHeight = Math.max(32, (containerHeight / Math.max(total,1)));
-  const top = 82 + (state.leftIndex / Math.max(1,total-1)) * (containerHeight - indicatorHeight);
+  const items = navUl.querySelectorAll('.nav-item');
+  if(!items.length) return;
+  const container = navList;
+  const containerHeight = container.offsetHeight;
+  const itemHeight = items[0].offsetHeight + 6; // includes margin-bottom
+  const total = items.length;
+
+  // indicator height proportional to visible area vs total
+  const visibleCount = Math.max(1, Math.floor(containerHeight / itemHeight));
+  const indicatorHeight = Math.max(28, Math.round((visibleCount / total) * containerHeight));
+  // prevent dividing by zero
+  const maxTop = Math.max(0, containerHeight - indicatorHeight);
+  const ratio = total > 1 ? (state.leftIndex / (total - 1)) : 0;
+  const indicatorTop = Math.round(container.getBoundingClientRect().top - leftCol.getBoundingClientRect().top + 12 + ratio * maxTop);
+
   leftScroll.style.height = indicatorHeight + 'px';
-  leftScroll.style.top = top + 'px';
-  // scroll the list to show selection if needed
-  const targetLi = navUl.querySelector(`[data-index="${state.leftIndex}"]`);
-  if(targetLi){
-    const parent = navUl.parentElement;
-    const parentRect = parent.getBoundingClientRect();
-    const childRect = targetLi.getBoundingClientRect();
-    if(childRect.top < parentRect.top){
-      parent.scrollTop -= (parentRect.top - childRect.top) + 8;
-    } else if(childRect.bottom > parentRect.bottom){
-      parent.scrollTop += (childRect.bottom - parentRect.bottom) + 8;
-    }
+  leftScroll.style.top = indicatorTop + 'px';
+
+  // ensure item is visible by using scrollIntoView
+  const selected = navUl.querySelector(`[data-index="${state.leftIndex}"]`);
+  if(selected){
+    selected.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    // update aria selection
+    navUl.querySelectorAll('.nav-item').forEach(li => li.setAttribute('aria-selected', 'false'));
+    selected.setAttribute('aria-selected', 'true');
   }
 }
 
 /* ========= OPEN SELECTED ========= */
 function openSelected(){
-  const selected = MENU[state.leftIndex];
-  if(!selected) return;
-  if(selected.key === 'search'){
-    // open search UI (simple built-in)
-    openSubmenu('search');
-  } else {
-    openSubmenu(selected.key);
-  }
+  const sel = MENU[state.leftIndex];
+  if(!sel) return;
+  openSubmenu(sel.key);
+}
+
+/* ========= SUBMENU SLIDE HELPERS ========= */
+function createPanelInner(){
+  const inner = document.createElement('div');
+  inner.className = 'panel-inner enter';
+  // after a frame, add active to play entrance
+  requestAnimationFrame(()=> inner.classList.add('enter-active'));
+  return inner;
+}
+function removePanelInner(old){
+  if(!old) return;
+  old.classList.add('exit-active');
+  // remove after transition
+  setTimeout(()=> { if(old.parentElement) old.parentElement.removeChild(old); }, 260);
 }
 
 /* ========= RENDER SUBMENU ========= */
@@ -426,14 +402,26 @@ function openSubmenu(key){
   state.currentColumn = key;
   state.submenuIndex = 0;
   panelTitle.textContent = submenu.title || 'Menu';
-  panelSub.textContent = 'Use Left to go back';
-  // build items
-  panelBody.innerHTML = '';
+  panelSub.textContent = 'Press Backspace to return';
+
+  // animate: create new inner and fade old out
+  const oldInner = panelBody.querySelector('.panel-inner');
+  if(oldInner) {
+    // mark exit and remove later
+    oldInner.classList.remove('enter', 'enter-active');
+    oldInner.classList.add('exit');
+    removePanelInner(oldInner);
+  }
+
+  const inner = createPanelInner();
+  // build content
   submenu.items.forEach((item, idx) => {
     const entry = document.createElement('div');
-    entry.className = 'entry fade-in';
+    entry.className = 'entry';
     entry.dataset.idx = idx;
     entry.dataset.id = item.id || (key + '_' + idx);
+    entry.setAttribute('role', 'button');
+    entry.setAttribute('aria-selected', idx === state.submenuIndex);
     entry.innerHTML = `<div class="name">${item.name}</div>`;
     const ctrl = document.createElement('div');
     ctrl.className = 'ctrl';
@@ -443,7 +431,7 @@ function openSubmenu(key){
       t.className = 'toggle ' + (state.values[item.id] ? 'on' : '');
       t.tabIndex = 0;
       t.innerHTML = '<div class="knob"></div>';
-      t.addEventListener('click', () => toggleItem(item.id));
+      t.addEventListener('click', (e)=> { e.stopPropagation(); toggleItem(item.id); });
       ctrl.appendChild(t);
     } else if(item.type === 'slider'){
       const wrap = document.createElement('div');
@@ -461,8 +449,10 @@ function openSubmenu(key){
       valSpan.textContent = String(val);
       wrap.appendChild(track);
       wrap.appendChild(valSpan);
-      // click to change
+
+      // click to set absolute position
       track.addEventListener('click', (ev)=> {
+        ev.stopPropagation();
         const rect = track.getBoundingClientRect();
         const x = ev.clientX - rect.left;
         const newPct = Math.max(0, Math.min(1, x / rect.width));
@@ -471,15 +461,15 @@ function openSubmenu(key){
         fill.style.width = percentFor(newValue,item.min,item.max) + '%';
         valSpan.textContent = String(newValue);
       });
+
       ctrl.appendChild(wrap);
     } else if(item.type === 'button'){
       const btn = document.createElement('button');
       btn.className = 'btn';
       btn.textContent = item.name;
-      btn.addEventListener('click', ()=> activateButton(item.id));
+      btn.addEventListener('click', (ev)=> { ev.stopPropagation(); activateButton(item.id); });
       ctrl.appendChild(btn);
     } else {
-      // generic label
       const span = document.createElement('div');
       span.className = 'subtitle';
       span.textContent = item.name;
@@ -487,12 +477,13 @@ function openSubmenu(key){
     }
 
     entry.appendChild(ctrl);
-    entry.addEventListener('click', ()=> { state.submenuIndex = idx; activateSubmenuItem(key, idx); });
-    panelBody.appendChild(entry);
+    entry.addEventListener('click', ()=> { state.submenuIndex = idx; activateSubmenuItem(key, idx); highlightSubmenu(); });
+    inner.appendChild(entry);
   });
 
-  // focus first entry visually
-  highlightSubmenu();
+  panelBody.appendChild(inner);
+  // ensure first highlighted
+  setTimeout(()=> highlightSubmenu(), 40);
 }
 
 /* ========= UTILITIES ========= */
@@ -500,46 +491,32 @@ function percentFor(value,min,max){
   if(max === undefined || min === undefined) return 0;
   return Math.round(((value - min) / (max - min)) * 100);
 }
-
 function setValue(id, value){
   state.values[id] = value;
   sendToFiveM('setState', { id, value });
 }
-
 function toggleItem(id){
   const newVal = !state.values[id];
   state.values[id] = newVal;
-  // update DOM toggle visual
   const el = panelBody.querySelector(`[data-id="${id}"] .toggle`);
   if(el) el.classList.toggle('on', !!newVal);
   sendToFiveM('toggleChanged', { id, state: newVal });
 }
-
-/* button action */
 function activateButton(id){
   sendToFiveM('buttonPressed', { id });
-  // small visual feedback
   const el = panelBody.querySelector(`[data-id="${id}"]`);
-  if(el){
-    el.style.transform = 'scale(.995)';
-    setTimeout(()=> el.style.transform = '', 120);
-  }
+  if(el){ el.style.transform = 'scale(.995)'; setTimeout(()=> el.style.transform = '', 120); }
 }
-
-/* activate submenu item when pressing enter */
 function activateSubmenuItem(key, idx){
   const submenu = SUBMENUS[key];
   if(!submenu) return;
   const item = submenu.items[idx];
   if(!item) return;
-  if(item.type === 'toggle'){
-    toggleItem(item.id);
-  } else if(item.type === 'slider'){
-    // increase slider as default action
+  if(item.type === 'toggle'){ toggleItem(item.id); }
+  else if(item.type === 'slider'){
     const cur = state.values[item.id] !== undefined ? state.values[item.id] : item.value;
     const next = Math.min(item.max, cur + 1);
     setValue(item.id, next);
-    // update visuals
     const container = panelBody.querySelector(`[data-idx="${idx}"]`);
     if(container){
       const fill = container.querySelector('.slider-fill');
@@ -547,25 +524,23 @@ function activateSubmenuItem(key, idx){
       if(fill) fill.style.width = percentFor(next,item.min,item.max)+'%';
       if(valSpan) valSpan.textContent = String(next);
     }
-  } else if(item.type === 'button'){
-    activateButton(item.id);
-  }
+  } else if(item.type === 'button'){ activateButton(item.id); }
 }
 
 /* highlight submenu selection */
 function highlightSubmenu(){
-  // clear all
-  panelBody.querySelectorAll('.entry').forEach((el,i)=> {
-    el.style.border = '1px solid rgba(255,255,255,0.02)';
-    el.style.opacity = '1';
-    el.classList.remove('focused');
+  const entries = panelBody.querySelectorAll('.entry');
+  entries.forEach((el, i)=> {
+    el.setAttribute('aria-selected', (i === state.submenuIndex));
+    if(i === state.submenuIndex){
+      el.style.border = '1px solid rgba(76,195,255,0.14)';
+      el.style.boxShadow = '0 12px 36px rgba(76,195,255,0.04)';
+      el.scrollIntoView({ block:'nearest', behavior:'smooth' });
+    } else {
+      el.style.border = '1px solid rgba(255,255,255,0.02)';
+      el.style.boxShadow = 'none';
+    }
   });
-  const selected = panelBody.querySelector(`[data-idx="${state.submenuIndex}"]`);
-  if(selected){
-    selected.style.border = '1px solid rgba(76,195,255,0.18)';
-    selected.style.boxShadow = '0 12px 36px rgba(76,195,255,0.04)';
-    selected.scrollIntoView({ block:'nearest', behavior:'smooth' });
-  }
 }
 
 /* update left active visual */
@@ -574,80 +549,97 @@ function updateLeftActive(){
     li.classList.remove('active');
     const idx = Number(li.dataset.index);
     if(idx === state.leftIndex && state.currentColumn === 'left') li.classList.add('active');
+    li.setAttribute('aria-selected', idx === state.leftIndex && state.currentColumn === 'left');
   });
   updateLeftScroll();
 }
 
-/* close submenu -> back to left nav */
+/* back to left nav */
 function backToLeft(){
+  if(state.currentColumn === 'left') {
+    // already in left -> close
+    sendToFiveM('menuClose', {});
+    return;
+  }
+  // animate old panel out
+  const oldInner = panelBody.querySelector('.panel-inner');
+  if(oldInner){
+    oldInner.classList.remove('enter', 'enter-active');
+    oldInner.classList.add('exit-active');
+    setTimeout(()=> { if(oldInner.parentElement) oldInner.parentElement.removeChild(oldInner); }, 260);
+  }
+
   state.currentColumn = 'left';
   panelTitle.textContent = 'Main menu';
-  panelSub.textContent = 'Use arrows / WASD — Enter to select — Esc to go back';
-  panelBody.innerHTML = `<div style="opacity:.6;color:${getComputedStyle(document.documentElement).getPropertyValue('--muted')};padding:12px">Select a category from the left.</div>`;
+  panelSub.textContent = 'Use arrows / WASD — Enter to select — Backspace to go back';
+  panelBody.innerHTML = `<div class="panel-inner enter enter-active" style="padding:14px;color:var(--muted)">Select a category from the left.</div>`;
   updateLeftActive();
 }
 
 /* ========= NAVIGATION HANDLERS ========= */
 function navUp(){
-  if(state.currentColumn === 'left'){
-    state.leftIndex = clampLeftIndex(state.leftIndex - 1);
-    renderLeft(); updateLeftActive();
-  } else {
-    // in submenu
-    state.submenuIndex = Math.max(0, state.submenuIndex - 1);
-    highlightSubmenu();
-  }
+  if(state.currentColumn === 'left'){ state.leftIndex = clampLeftIndex(state.leftIndex - 1); renderLeft(); updateLeftActive(); }
+  else { state.submenuIndex = Math.max(0, state.submenuIndex - 1); highlightSubmenu(); }
 }
 function navDown(){
-  if(state.currentColumn === 'left'){
-    state.leftIndex = clampLeftIndex(state.leftIndex + 1);
-    renderLeft(); updateLeftActive();
-  } else {
-    // in submenu
-    const max = panelBody.querySelectorAll('.entry').length - 1;
-    state.submenuIndex = Math.min(max, state.submenuIndex + 1);
-    highlightSubmenu();
-  }
+  if(state.currentColumn === 'left'){ state.leftIndex = clampLeftIndex(state.leftIndex + 1); renderLeft(); updateLeftActive(); }
+  else { const max = panelBody.querySelectorAll('.entry').length - 1; state.submenuIndex = Math.min(max, state.submenuIndex + 1); highlightSubmenu(); }
 }
 function navLeft(){
-  if(state.currentColumn === 'left') return;
-  // back to left
-  backToLeft();
+  if(state.currentColumn !== 'left') backToLeft();
 }
 function navRight(){
-  if(state.currentColumn === 'left'){
-    openSelected();
-    updateLeftActive();
-  } else {
-    // maybe open deeper? for now no deeper panels — treat as enter
-    activateSubmenuItem(state.currentColumn, state.submenuIndex);
-  }
+  if(state.currentColumn === 'left'){ openSelected(); updateLeftActive(); }
+  else { activateSubmenuItem(state.currentColumn, state.submenuIndex); }
 }
 function navEnter(){
-  if(state.currentColumn === 'left'){
-    openSelected();
-  } else {
-    activateSubmenuItem(state.currentColumn, state.submenuIndex);
-  }
+  if(state.currentColumn === 'left') openSelected();
+  else activateSubmenuItem(state.currentColumn, state.submenuIndex);
 }
 function navBack(){
-  if(state.currentColumn !== 'left'){
-    backToLeft();
-  } else {
-    // if already in left - maybe close menu; we just print
-    sendToFiveM('menuClose', {});
-  }
+  // Backspace behavior requested:
+  // - if in submenu -> go back to main
+  // - if in main -> close menu (send menuClose)
+  if(state.currentColumn !== 'left') backToLeft();
+  else sendToFiveM('menuClose', {});
 }
 
-/* keyboard listener */
-window.addEventListener('keydown', (e)=>{
-  const key = e.key.toLowerCase();
-  if(['arrowup','w'].includes(e.key.toLowerCase()) || key === 'w') { e.preventDefault(); navUp(); }
-  else if(['arrowdown','s'].includes(e.key.toLowerCase()) || key === 's') { e.preventDefault(); navDown(); }
-  else if(['arrowleft','a','escape','backspace'].includes(e.key.toLowerCase()) || key === 'a') { e.preventDefault(); navLeft(); }
-  else if(['arrowright','d'].includes(e.key.toLowerCase()) || key === 'd') { e.preventDefault(); navRight(); }
-  else if(e.key === 'Enter') { e.preventDefault(); navEnter(); }
-  else if(e.key === 'Escape') { e.preventDefault(); navBack(); }
+/* ------- keyboard listener: reliable detection including Backspace ------- */
+window.addEventListener('keydown', (e) => {
+  // ignore if focus on input/textarea for normal typing
+  const tag = (document.activeElement && document.activeElement.tagName) || '';
+  if(tag === 'INPUT' || tag === 'TEXTAREA' || document.activeElement.isContentEditable) return;
+
+  // map keys robustly
+  switch(e.key){
+    case 'ArrowUp':
+    case 'w':
+    case 'W':
+      e.preventDefault(); navUp(); break;
+    case 'ArrowDown':
+    case 's':
+    case 'S':
+      e.preventDefault(); navDown(); break;
+    case 'ArrowLeft':
+    case 'a':
+    case 'A':
+      e.preventDefault(); navLeft(); break;
+    case 'ArrowRight':
+    case 'd':
+    case 'D':
+      e.preventDefault(); navRight(); break;
+    case 'Enter':
+      e.preventDefault(); navEnter(); break;
+    case 'Escape':
+      e.preventDefault(); navBack(); break;
+    case 'Backspace':
+      // user asked specifically for Backspace to go back
+      e.preventDefault();
+      navBack();
+      break;
+    default:
+      break;
+  }
 });
 
 /* ========= external message handler (FiveM) =========
@@ -658,17 +650,18 @@ window.addEventListener('keydown', (e)=>{
 window.addEventListener('message', (ev)=>{
   const data = ev.data || {};
   if(data.action === 'navigate'){
-    if(data.direction === 'up') navUp();
-    else if(data.direction === 'down') navDown();
-    else if(data.direction === 'left') navLeft();
-    else if(data.direction === 'right') navRight();
-    else if(data.direction === 'enter') navEnter();
-    else if(data.direction === 'back') navBack();
+    switch(data.direction){
+      case 'up': navUp(); break;
+      case 'down': navDown(); break;
+      case 'left': navLeft(); break;
+      case 'right': navRight(); break;
+      case 'enter': navEnter(); break;
+      case 'back': navBack(); break;
+    }
     return;
   }
-  if(data.action === 'setState' && data.id!==undefined){
+  if(data.action === 'setState' && data.id !== undefined){
     state.values[data.id] = data.value;
-    // update UI if present
     const toggle = panelBody.querySelector(`[data-id="${data.id}"] .toggle`);
     if(toggle) toggle.classList.toggle('on', !!data.value);
     const fill = panelBody.querySelector(`[data-id="${data.id}"] .slider-fill`);
@@ -695,15 +688,13 @@ function findItemById(id){
 /* FiveM send wrapper - compatible with DUI (POST) or fallback console.log */
 function sendToFiveM(eventName, data = {}){
   try {
-    // in FiveM, you usually POST to https://<resourceName>/<eventName>
-    if(window.invokeNative || typeof window.fetch === 'function' && typeof GetParentResourceName === 'function'){
+    if(typeof GetParentResourceName === 'function' && typeof fetch === 'function'){
       fetch(`https://${GetParentResourceName()}/${eventName}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json; charset=utf-8' },
         body: JSON.stringify(data)
       }).catch(e => console.log('sendToFiveM fetch error', e));
     } else {
-      // not in FiveM environment: log
       console.log('FiveM Event:', eventName, data);
     }
   } catch(err){
@@ -713,20 +704,13 @@ function sendToFiveM(eventName, data = {}){
 
 /* ========= INIT ========= */
 function init(){
-  // render left items
   renderLeft();
-  // initial panel content
-  panelBody.innerHTML = `<div style="opacity:.7;color:var(--muted);padding:12px">Welcome. Select a category on the left to begin.</div>`;
+  panelBody.innerHTML = `<div class="panel-inner enter enter-active" style="padding:14px;color:var(--muted)">Welcome. Select a category on the left to begin.</div>`;
   updateLeftActive();
-  // give a small entrance animation
   document.querySelectorAll('.fade-in').forEach((el, i)=> el.style.animationDelay = (i*12)+'ms');
 }
-
-/* ========= accessibility helpers: focus visuals when clicking left menu items ====== */
-navUl.addEventListener('focusin', ()=> updateLeftActive());
-
-/* run it */
 init();
+
 </script>
 </body>
 </html>
