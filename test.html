@@ -1,216 +1,732 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Avaris Menu</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Avaris — Elite Menu (Redesign)</title>
 <style>
-    * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-    body { background: transparent; display:flex; justify-content:center; align-items:center; min-height:100vh; overflow:hidden; }
-    .menu-container { width:320px; background:rgba(20,20,20,0.95); border:1px solid rgba(255,255,255,0.1); box-shadow:0 0 40px rgba(0,0,0,0.8); position:relative; display:flex; flex-direction:column; }
-    .header { background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.6)), url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 80"><rect fill="%23b22234" width="320" height="80"/><rect fill="%23fff" y="12" width="320" height="8"/><rect fill="%23fff" y="28" width="320" height="8"/><rect fill="%23fff" y="44" width="320" height="8"/><rect fill="%23fff" y="60" width="320" height="8"/><rect fill="%233c3b6e" width="130" height="44"/></svg>'); background-size:cover; background-position:center; padding:20px; text-align:center; border-bottom:2px solid rgba(200,0,0,0.5); }
-    .logo-text { font-size:42px; font-weight:bold; color:#fff; text-shadow:3px 3px 0 rgba(200,0,0,0.8), -1px -1px 0 rgba(0,0,0,0.5), 0 0 20px rgba(255,0,0,0.6); letter-spacing:3px; transform:skewY(-2deg); }
-    .menu-title { background:rgba(40,40,40,0.9); padding:10px 15px; color:#fff; font-size:13px; font-weight:600; border-bottom:1px solid rgba(255,255,255,0.05); }
-    .menu-items { list-style:none; max-height:420px; overflow:hidden; position:relative; background:rgba(30,30,30,0.95); }
-    .scroll-indicator { position:absolute; left:0; width:3px; background:linear-gradient(180deg, rgba(200,0,0,0.8) 0%, rgba(150,0,0,0.8) 100%); transition:all 0.2s ease; box-shadow:0 0 8px rgba(200,0,0,0.6); }
-    .menu-item { padding:11px 15px; color:#bbb; font-size:14px; border-bottom:1px solid rgba(255,255,255,0.03); cursor:pointer; transition:all 0.3s; display:flex; justify-content:space-between; align-items:center; background:rgba(40,40,40,0.5); }
-    .menu-item.selected { background:linear-gradient(90deg, rgba(100,100,100,0.6) 0%, rgba(70,70,70,0.6) 100%); color:#fff; border-left:3px solid #888; }
-    .menu-item.has-submenu::after { content:'›'; color:#888; font-size:20px; font-weight:bold; }
-    .menu-item.search::after { content:'🔍'; font-size:14px; filter:grayscale(100%); }
-    .toggle-switch { width:36px; height:18px; background:rgba(100,100,100,0.5); border-radius:12px; position:relative; cursor:pointer; border:1px solid rgba(255,255,255,0.1); transition:all 0.3s ease; }
-    .toggle-switch.active { background:linear-gradient(90deg,#ff4444 0%,#cc0000 100%); box-shadow:0 0 10px rgba(255,0,0,0.5); }
-    .toggle-switch::after { content:''; position:absolute; width:14px; height:14px; background:#fff; border-radius:50%; top:1px; left:2px; transition:all 0.3s ease; box-shadow:0 2px 4px rgba(0,0,0,0.3); }
-    .toggle-switch.active::after { left:18px; }
-    .slider-container { display:flex; align-items:center; gap:10px; flex:1; }
-    .slider { flex:1; height:4px; background:rgba(100,100,100,0.5); border-radius:2px; position:relative; cursor:pointer; }
-    .slider-fill { height:100%; background:linear-gradient(90deg,#666 0%,#999 100%); border-radius:2px; transition:width 0.2s ease; }
-    .slider-value { color:#aaa; font-size:12px; min-width:50px; text-align:right; }
-    .submenu-item { padding-left:15px; font-size:13px; }
-    .back-button { background:rgba(60,60,60,0.8); border:none; color:#fff; padding:11px 15px; cursor:pointer; font-size:13px; width:100%; text-align:left; border-bottom:1px solid rgba(255,255,255,0.05); }
-    .back-button.selected { background:linear-gradient(90deg, rgba(100,100,100,0.6) 0%, rgba(70,70,70,0.6) 100%); border-left:3px solid #888; }
-    .footer { padding:8px 15px; background:rgba(20,20,20,0.95); color:#888; font-size:11px; display:flex; align-items:center; gap:8px; border-top:1px solid rgba(255,255,255,0.05); }
-    .footer-icon { width:16px; height:16px; background:rgba(200,0,0,0.3); border-radius:3px; display:flex; align-items:center; justify-content:center; font-size:10px; color:#ff6666; }
-    .footer-text { color:#999; }
-    /* Notifications */
-    .notification { position:absolute; top:10px; left:50%; transform:translateX(-50%); background:rgba(50,50,50,0.95); color:#fff; padding:8px 15px; border-radius:6px; box-shadow:0 0 12px rgba(0,0,0,0.5); opacity:0; transition:all 0.4s; pointer-events:none; z-index:1000; }
-    .notification.show { opacity:1; }
-    /* Input Box */
-    .input-overlay { position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); display:flex; justify-content:center; align-items:center; flex-direction:column; z-index:900; display:none; }
-    .input-overlay.active { display:flex; }
-    .input-box { background:rgba(40,40,40,0.95); padding:12px 15px; border-radius:6px; color:#fff; font-size:14px; width:80%; text-align:center; }
+  :root{
+    --bg:#07070b;
+    --panel:#0f1116;
+    --muted:#9aa1b3;
+    --accent-1:#4cc3ff;
+    --accent-2:#8b5cf6;
+    --glass: rgba(255,255,255,0.03);
+    --glass-2: rgba(255,255,255,0.02);
+    --red: #ff4d6d;
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    font-family: Inter, "Segoe UI", Roboto, system-ui, -apple-system, "Helvetica Neue", Arial;
+    background: linear-gradient(180deg, rgba(6,8,11,0.6), rgba(2,3,5,0.6));
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:28px;
+  }
+
+  /* Root container */
+  .menu-root{
+    width: 920px;
+    max-width: calc(100vw - 40px);
+    height: 560px;
+    display:grid;
+    grid-template-columns: 320px 1fr;
+    border-radius: 12px;
+    overflow: hidden;
+    background: linear-gradient(180deg, rgba(10,12,16,0.9), rgba(5,6,9,0.85));
+    box-shadow: 0 20px 60px rgba(3,6,12,0.9), 0 2px 8px rgba(0,0,0,0.6);
+    border: 1px solid rgba(255,255,255,0.03);
+  }
+
+  /* Left navigation */
+  .left {
+    padding: 18px;
+    background: linear-gradient(180deg, rgba(12,14,18,0.6), rgba(8,9,12,0.45));
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+    position:relative;
+  }
+
+  .brand {
+    display:flex;
+    gap:12px;
+    align-items:center;
+    user-select:none;
+  }
+
+  .logo {
+    width:56px;height:56px;border-radius:10px;
+    background: linear-gradient(135deg,var(--accent-1),var(--accent-2));
+    display:flex;align-items:center;justify-content:center;
+    color:rgba(10,10,12,0.02); font-weight:800; letter-spacing:1.8px;
+    box-shadow: 0 6px 22px rgba(139,92,246,0.18), inset 0 -6px 18px rgba(0,0,0,0.15);
+    transform: rotate(-6deg);
+    font-family:monospace;
+  }
+
+  .brand .title{
+    color:#eaf2ff;
+    font-size:18px;
+    font-weight:700;
+    line-height:1;
+  }
+  .brand .subtitle{
+    color:var(--muted);
+    font-size:12px;
+  }
+
+  .left-sep{
+    height:1px;background:var(--glass);margin:6px 0;border-radius:2px;
+  }
+
+  .nav{
+    position:relative;
+    flex:1;
+    display:flex;
+    gap:8px;
+  }
+
+  .nav-list{
+    width:100%;
+    overflow:hidden;
+    position:relative;
+  }
+
+  .nav-list ul{ list-style:none; padding:4px 4px; max-height:420px; overflow:auto; }
+  .nav-list ul::-webkit-scrollbar{ width:8px }
+  .nav-list ul::-webkit-scrollbar-thumb{ background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02)); border-radius:6px }
+
+  .nav-item{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:10px 12px; gap:10px; border-radius:8px;
+    color:var(--muted); cursor:pointer; margin-bottom:6px;
+    transition: all .18s cubic-bezier(.2,.9,.2,1);
+    background: linear-gradient(180deg, rgba(255,255,255,0.012), rgba(255,255,255,0.01));
+    border:1px solid transparent;
+    backdrop-filter: blur(6px) saturate(120%);
+  }
+
+  .nav-item .label{ font-weight:600 }
+  .nav-item .hint{ font-size:12px; color:rgba(160,170,190,0.7) }
+
+  .nav-item:hover{
+    transform: translateX(6px);
+    color: #fff;
+    box-shadow: 0 8px 20px rgba(76,195,255,0.06);
+    border-color: rgba(76,195,255,0.08);
+  }
+
+  .nav-item.active{
+    background: linear-gradient(90deg, rgba(76,195,255,0.08), rgba(139,92,246,0.06));
+    color: #fff;
+    border-left: 4px solid var(--accent-1);
+    transform: none;
+  }
+
+  /* scroll indicator on left column */
+  .left .scroll-indicator{
+    width:4px;
+    background: linear-gradient(180deg,var(--accent-1),var(--accent-2));
+    position:absolute;
+    left:8px;
+    top:82px;
+    border-radius:3px;
+    box-shadow: 0 6px 18px rgba(139,92,246,0.12);
+    transition: top .15s linear, height .15s linear;
+  }
+
+  /* Right panel / submenu area */
+  .right{
+    padding:20px;
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+  }
+
+  .panel-header{
+    display:flex; align-items:center; justify-content:space-between;
+  }
+
+  .panel-title{
+    color:#fff; font-size:20px; font-weight:700;
+    letter-spacing:0.6px;
+  }
+  .panel-sub{
+    color:var(--muted); font-size:13px;
+  }
+
+  .panel-body{
+    display:grid;
+    grid-template-columns: 1fr;
+    gap:12px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.005));
+    border-radius:10px;
+    padding:14px;
+    height: calc(100% - 86px);
+    overflow:auto;
+  }
+
+  /* submenu item */
+  .entry{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:12px;border-radius:8px;
+    background: linear-gradient(180deg, rgba(0,0,0,0.25), rgba(255,255,255,0.01));
+    border:1px solid rgba(255,255,255,0.02);
+    color:var(--muted); transition: all .12s ease;
+  }
+  .entry:hover{ transform: translateY(-3px); color:#fff; box-shadow: 0 10px 30px rgba(10,12,16,0.7) }
+
+  .entry .name{ font-weight:600 }
+  .entry .ctrl{ display:flex; gap:12px; align-items:center }
+
+  /* Toggle control */
+  .toggle {
+    width:42px; height:22px; border-radius:999px; padding:2px; cursor:pointer;
+    background: rgba(255,255,255,0.05); position:relative; transition: all .18s;
+    border:1px solid rgba(255,255,255,0.03);
+  }
+  .toggle .knob{
+    width:18px; height:18px; border-radius:50%; background:#fff; transform:translateX(0);
+    transition: transform .18s cubic-bezier(.2,.9,.2,1), box-shadow .18s;
+    box-shadow: 0 6px 14px rgba(0,0,0,0.35);
+  }
+  .toggle.on{ background: linear-gradient(90deg, var(--accent-1), var(--accent-2)); box-shadow: 0 6px 24px rgba(76,195,255,0.08) }
+  .toggle.on .knob{ transform: translateX(20px) }
+
+  /* Slider control */
+  .slider-wrap{ display:flex; align-items:center; gap:12px; min-width:220px; }
+  .slider-track{
+    height:8px; width:180px; background:rgba(255,255,255,0.03); border-radius:999px; position:relative; overflow:hidden;
+  }
+  .slider-fill{ height:100%; width:50%; background: linear-gradient(90deg,var(--accent-1),var(--accent-2)); border-radius:999px; transition: width .12s linear }
+  .slider-value{ min-width:38px; text-align:right; color:var(--muted); font-weight:700 }
+
+  /* Button entry */
+  .btn{
+    padding:8px 12px;border-radius:8px;background:linear-gradient(90deg,var(--red),#b2002f); color:#fff;font-weight:700;
+    border: none; cursor: pointer; box-shadow: 0 8px 18px rgba(178,0,47,0.14);
+  }
+
+  /* small footer */
+  .meta{
+    display:flex; align-items:center; justify-content:space-between; color:var(--muted); font-size:13px;
+    padding-top:6px;
+  }
+
+  /* responsive small */
+  @media (max-width:980px){
+    .menu-root{ width: 96vw; grid-template-columns: 1fr; height: 760px; }
+    .left{ order:2 }
+    .right{ order:1; height: 420px }
+    .left .scroll-indicator{ left:6px; top:120px }
+  }
+
+  /* subtle animations */
+  .fade-in { animation: fadeIn .22s ease both }
+  @keyframes fadeIn { from{ opacity:0; transform: translateY(6px) } to{ opacity:1; transform:none } }
 </style>
 </head>
 <body>
-<div class="menu-container">
-    <div class="header"><div class="logo-text">AVARIS</div></div>
-    <div class="menu-title" id="menuTitle">Main menu</div>
-    <ul class="menu-items" id="menuContent">
-        <div class="scroll-indicator" id="scrollIndicator"></div>
-        <li class="menu-item has-submenu selected" data-index="0">Player</li>
-        <li class="menu-item has-submenu" data-index="1">Server</li>
-        <li class="menu-item has-submenu" data-index="2">Weapon</li>
-        <li class="menu-item has-submenu" data-index="3">Vehicle</li>
-        <li class="menu-item has-submenu" data-index="4">Miscellaneous</li>
-        <li class="menu-item has-submenu" data-index="5">Settings</li>
-        <li class="menu-item search" data-index="6">Search</li>
-    </ul>
-    <div class="footer"><div class="footer-icon">⚠</div><span class="footer-text">680023 | 6d ago</span></div>
-</div>
+  <div class="menu-root" role="application" aria-label="Avaris Menu">
+    <!-- LEFT NAV -->
+    <div class="left" id="leftCol">
+      <div class="brand">
+        <div class="logo">AV</div>
+        <div>
+          <div class="title">Avaris</div>
+          <div class="subtitle">Elite · v1.0</div>
+        </div>
+      </div>
 
-<!-- Notifications -->
-<div class="notification" id="notification"></div>
+      <div class="left-sep" aria-hidden="true"></div>
 
-<!-- Input Overlay -->
-<div class="input-overlay" id="inputOverlay">
-    <div class="input-box" id="inputBox" contenteditable="true"></div>
-</div>
+      <div class="nav">
+        <div class="nav-list" id="navList" tabindex="-1" role="listbox" aria-activedescendant="">
+          <ul id="navUl" role="list"></ul>
+        </div>
+        <div class="scroll-indicator" id="leftScroll"></div>
+      </div>
+
+      <div class="left-sep" aria-hidden="true"></div>
+
+      <div class="meta">
+        <div>680023</div>
+        <div class="subtitle">6d ago</div>
+      </div>
+    </div>
+
+    <!-- RIGHT PANEL -->
+    <div class="right">
+      <div class="panel-header">
+        <div>
+          <div class="panel-title" id="panelTitle">Main menu</div>
+          <div class="panel-sub" id="panelSub">Use arrows / WASD — Enter to select — Esc to go back</div>
+        </div>
+        <div class="panel-actions">
+          <!-- reserved for future buttons -->
+        </div>
+      </div>
+
+      <div class="panel-body" id="panelBody" role="region" aria-live="polite"></div>
+    </div>
+  </div>
 
 <script>
-const submenus = {
-    player: { title:'Player', items:[{name:'NoClip',type:'toggle'},{name:'Noclip speed',type:'slider',min:0,max:100,value:50},{name:'Change Menu Key',type:'keybind'}] },
-    server: { title:'Server', items:[{name:'Show Player Names',type:'toggle'},{name:'Show Player IDs',type:'toggle'},{name:'Display Ping',type:'toggle'},{name:'Show Coordinates',type:'toggle'}] },
-    weapon: { title:'Weapon', items:[{name:'Infinite Ammo',type:'toggle'},{name:'No Reload',type:'toggle'},{name:'Rapid Fire',type:'toggle'},{name:'No Recoil',type:'toggle'},{name:'One Shot Kill',type:'toggle'}] },
-    vehicle: { title:'Vehicle', items:[{name:'Boost Speed',type:'toggle'},{name:'Rainbow Paint',type:'toggle'},{name:'Repair Vehicle',type:'toggle'},{name:'Flip Vehicle',type:'toggle'}] },
-    miscellaneous: { title:'Miscellaneous', items:[{name:'Nuke Server',type:'button'}] },
-    settings: { title:'Settings', items:[{name:'Menu Keybind',type:'keybind'},{name:'Animations Speed',type:'slider',min:0,max:100,value:95}] }
+/* ========= DATA ========= */
+const MENU = [
+  { key: 'player', label: 'Player', hint: 'Personal options' },
+  { key: 'server', label: 'Server', hint: 'Server toggles' },
+  { key: 'weapon', label: 'Weapon', hint: 'Guns & combat' },
+  { key: 'vehicle', label: 'Vehicle', hint: 'Vehicle utilities' },
+  { key: 'miscellaneous', label: 'Miscellaneous', hint: 'Odds & ends' },
+  { key: 'settings', label: 'Settings', hint: 'Interface' },
+  { key: 'search', label: 'Search', hint: 'Quick search' }
+];
+
+const SUBMENUS = {
+  player: {
+    title: 'Player',
+    items: [
+      { name: 'NoClip', type: 'toggle', id: 'player_noclip' },
+      { name: 'Noclip speed', type: 'slider', min:0, max:100, value:50, id:'player_noclip_speed' },
+      { name: 'Health Regen', type: 'toggle', id:'player_regen' }
+    ]
+  },
+  server: {
+    title: 'Server',
+    items: [
+      { name: 'Show Player Names', type: 'toggle', id:'server_names' },
+      { name: 'Show Player IDs', type: 'toggle', id:'server_ids' },
+      { name: 'Display Ping', type: 'toggle', id:'server_ping' },
+      { name: 'Show Coordinates', type: 'toggle', id:'server_coords' }
+    ]
+  },
+  weapon: {
+    title: 'Weapon',
+    items: [
+      { name: 'Infinite Ammo', type: 'toggle', id:'wp_infinite' },
+      { name: 'No Reload', type: 'toggle', id:'wp_noreload' },
+      { name: 'Rapid Fire', type: 'toggle', id:'wp_rapid' },
+      { name: 'No Recoil', type: 'toggle', id:'wp_norecoil' },
+      { name: 'One Shot Kill', type: 'toggle', id:'wp_oneshot' }
+    ]
+  },
+  vehicle: {
+    title: 'Vehicle',
+    items: [
+      { name: 'Boost Speed', type: 'toggle', id:'veh_boost' },
+      { name: 'Rainbow Paint', type: 'toggle', id:'veh_rainbow' },
+      { name: 'Repair Vehicle', type: 'button', id:'veh_repair' },
+      { name: 'Flip Vehicle', type: 'button', id:'veh_flip' }
+    ]
+  },
+  miscellaneous: {
+    title: 'Miscellaneous',
+    items: [
+      { name: 'Nuke Server', type: 'button', id:'misc_nuke' },
+    ]
+  },
+  settings: {
+    title: 'Settings',
+    items: [
+      { name: 'Menu Keybind', type: 'toggle', id:'set_keybind' },
+      { name: 'Animations Speed', type: 'slider', min:0, max:100, value:95, id:'set_anim_speed' }
+    ]
+  },
+  search: {
+    title: 'Search',
+    items: [
+      { name: 'Open quick search', type: 'button', id:'search_open' }
+    ]
+  }
 };
 
-let currentMenu='main', currentIndex=0, itemStates={}, inputActive=false, keybindListening=false, keybindTarget=null;
+/* ========= STATE ========= */
+let state = {
+  currentColumn: 'left', // 'left' or submenu key
+  leftIndex: 0,          // index in MENU array
+  submenuIndex: 0,       // index in submenu items (when in submenu)
+  values: {},            // persistent toggle/slider values keyed by id
+};
 
-const menuContent=document.getElementById('menuContent');
-const menuTitle=document.getElementById('menuTitle');
-const scrollIndicator=document.getElementById('scrollIndicator');
-const notification=document.getElementById('notification');
-const inputOverlay=document.getElementById('inputOverlay');
-const inputBox=document.getElementById('inputBox');
+/* helper: ensure leftIndex in range */
+function clampLeftIndex(i){ return Math.max(0, Math.min(MENU.length-1, i)); }
 
-function renderMainMenu(){
-    currentMenu='main'; currentIndex=0;
-    menuTitle.textContent='Main menu';
-    menuContent.innerHTML=`
-        <div class="scroll-indicator" id="scrollIndicator"></div>
-        <li class="menu-item has-submenu selected" data-index="0">Player</li>
-        <li class="menu-item has-submenu" data-index="1">Server</li>
-        <li class="menu-item has-submenu" data-index="2">Weapon</li>
-        <li class="menu-item has-submenu" data-index="3">Vehicle</li>
-        <li class="menu-item has-submenu" data-index="4">Miscellaneous</li>
-        <li class="menu-item has-submenu" data-index="5">Settings</li>
-        <li class="menu-item search" data-index="6">Search</li>
-    `;
-    updateScrollIndicator();
+/* ========= DOM REFS ========= */
+const navUl = document.getElementById('navUl');
+const leftScroll = document.getElementById('leftScroll');
+const panelTitle = document.getElementById('panelTitle');
+const panelSub = document.getElementById('panelSub');
+const panelBody = document.getElementById('panelBody');
+const leftCol = document.getElementById('leftCol');
+
+/* ========= RENDER LEFT NAV ========= */
+function renderLeft(){
+  navUl.innerHTML = '';
+  MENU.forEach((m, idx) => {
+    const li = document.createElement('li');
+    li.className = 'nav-item fade-in' + (state.leftIndex === idx && state.currentColumn==='left' ? ' active' : '');
+    li.dataset.index = idx;
+    li.dataset.key = m.key;
+    li.setAttribute('role', 'option');
+    li.setAttribute('aria-selected', state.leftIndex===idx && state.currentColumn==='left');
+    li.innerHTML = `<div class="label">${m.label}</div><div class="hint">${m.hint}</div>`;
+    li.addEventListener('click', () => { state.leftIndex = idx; openSelected(); });
+    navUl.appendChild(li);
+  });
+  requestAnimationFrame(updateLeftScroll);
 }
 
-function renderSubmenu(menuName){
-    const submenu=submenus[menuName]; if(!submenu) return;
-    currentMenu=menuName; currentIndex=0;
-    menuTitle.textContent=submenu.title;
-    let html='<div class="scroll-indicator" id="scrollIndicator"></div>';
-    html+='<button class="back-button selected" data-index="0">← Back</button>';
-    submenu.items.forEach((item,index)=>{
-        const itemId=`${menuName}_${index}`; const itemIndex=index+1;
-        if(item.type==='toggle'){
-            const isActive=itemStates[itemId]||false;
-            html+=`<li class="menu-item submenu-item" data-index="${itemIndex}" data-id="${itemId}"><span>${item.name}</span><div class="toggle-switch ${isActive?'active':''}" id="${itemId}"></div></li>`;
-        }else if(item.type==='slider'){
-            const value=itemStates[itemId]!==undefined?itemStates[itemId]:item.value;
-            const percent=((value-item.min)/(item.max-item.min))*100;
-            html+=`<li class="menu-item submenu-item" data-index="${itemIndex}" data-id="${itemId}"><span>${item.name}</span><div class="slider-container"><div class="slider"><div class="slider-fill" style="width:${percent}%"></div></div><span class="slider-value">${value}</span></div></li>`;
-        }else if(item.type==='keybind'){
-            const value=itemStates[itemId]!==undefined?itemStates[itemId]:'None';
-            html+=`<li class="menu-item submenu-item" data-index="${itemIndex}" data-id="${itemId}"><span>${item.name}</span><span class="slider-value">${value}</span></li>`;
-        }else if(item.type==='button'){
-            html+=`<li class="menu-item submenu-item" data-index="${itemIndex}" data-id="${itemId}"><span>${item.name}</span></li>`;
-        }
-    });
-    menuContent.innerHTML=html; updateScrollIndicator();
-}
-
-function updateSelection(){
-    const items=document.querySelectorAll('[data-index]');
-    items.forEach(item=>{parseInt(item.dataset.index)===currentIndex?item.classList.add('selected'):item.classList.remove('selected');});
-    updateScrollIndicator();
-}
-
-function updateScrollIndicator(){
-    const items=document.querySelectorAll('[data-index]'); if(!scrollIndicator||items.length===0)return;
-    const totalItems=items.length; const menuHeight=menuContent.offsetHeight;
-    scrollIndicator.style.height=(menuHeight/totalItems)+'px';
-    scrollIndicator.style.top=(currentIndex*(menuHeight/totalItems))+'px';
-}
-
-function showNotification(text,type='info'){
-    notification.textContent=text; notification.classList.add('show');
-    setTimeout(()=>{notification.classList.remove('show');},3000);
-}
-
-function openInput(placeholder='',callback=null){
-    inputActive=true; inputOverlay.classList.add('active');
-    inputBox.textContent=''; inputBox.focus(); inputBox.setAttribute('data-callback',callback?callback:'');
-    inputBox.setAttribute('data-placeholder',placeholder); inputBox.setAttribute('placeholder',placeholder);
-}
-
-function closeInput(result=null){
-    inputActive=false; inputOverlay.classList.remove('active');
-    if(result!==null){
-        const callback=inputBox.getAttribute('data-callback');
-        if(callback==='search'){ sendToFiveM('inputResult',{value:result}); }
+/* ========= LEFT SCROLL INDICATOR ========= */
+function updateLeftScroll(){
+  const list = navUl.querySelectorAll('.nav-item');
+  if(!list.length) return;
+  const containerHeight = leftCol.querySelector('.nav-list').offsetHeight;
+  const itemHeight = list[0].offsetHeight + 6; // include margin-bottom
+  const visibleCount = Math.floor(containerHeight / itemHeight);
+  const total = list.length;
+  const indicatorHeight = Math.max(32, (containerHeight / Math.max(total,1)));
+  const top = 82 + (state.leftIndex / Math.max(1,total-1)) * (containerHeight - indicatorHeight);
+  leftScroll.style.height = indicatorHeight + 'px';
+  leftScroll.style.top = top + 'px';
+  // scroll the list to show selection if needed
+  const targetLi = navUl.querySelector(`[data-index="${state.leftIndex}"]`);
+  if(targetLi){
+    const parent = navUl.parentElement;
+    const parentRect = parent.getBoundingClientRect();
+    const childRect = targetLi.getBoundingClientRect();
+    if(childRect.top < parentRect.top){
+      parent.scrollTop -= (parentRect.top - childRect.top) + 8;
+    } else if(childRect.bottom > parentRect.bottom){
+      parent.scrollTop += (childRect.bottom - parentRect.bottom) + 8;
     }
+  }
 }
 
-function handleEnter(){
-    if(inputActive){ closeInput(inputBox.textContent); return; }
-    if(currentMenu==='main'){ const menuNames=['player','server','weapon','vehicle','miscellaneous','settings','search']; if(currentIndex<menuNames.length){ renderSubmenu(menuNames[currentIndex]); } }
-    else{
-        if(currentIndex===0){ renderMainMenu(); return; }
-        const items=document.querySelectorAll('[data-index]');
-        const selectedItem=Array.from(items).find(item=>parseInt(item.dataset.index)===currentIndex);
-        if(selectedItem&&selectedItem.dataset.id){
-            const itemId=selectedItem.dataset.id;
-            const toggle=selectedItem.querySelector('.toggle-switch');
-            if(toggle){ itemStates[itemId]=!itemStates[itemId]; toggle.classList.toggle('active'); sendToFiveM('toggleChanged',{id:itemId,state:itemStates[itemId]}); }
-            else{
-                const menuName=currentMenu; const itemIndex=currentIndex-1; const item=submenus[menuName].items[itemIndex];
-                if(item.type==='keybind'){ keybindListening=true; keybindTarget=itemId; showNotification('Press any key to assign'); }
-                else if(item.type==='button'){ sendToFiveM('buttonPressed',{id:itemId}); showNotification(item.name+' pressed'); }
-            }
-        }
-    }
+/* ========= OPEN SELECTED ========= */
+function openSelected(){
+  const selected = MENU[state.leftIndex];
+  if(!selected) return;
+  if(selected.key === 'search'){
+    // open search UI (simple built-in)
+    openSubmenu('search');
+  } else {
+    openSubmenu(selected.key);
+  }
 }
 
-function handleBack(){ if(inputActive){ closeInput(); return; } if(currentMenu!=='main'){ renderMainMenu(); updateSelection(); } }
+/* ========= RENDER SUBMENU ========= */
+function openSubmenu(key){
+  const submenu = SUBMENUS[key];
+  if(!submenu) return;
+  state.currentColumn = key;
+  state.submenuIndex = 0;
+  panelTitle.textContent = submenu.title || 'Menu';
+  panelSub.textContent = 'Use Left to go back';
+  // build items
+  panelBody.innerHTML = '';
+  submenu.items.forEach((item, idx) => {
+    const entry = document.createElement('div');
+    entry.className = 'entry fade-in';
+    entry.dataset.idx = idx;
+    entry.dataset.id = item.id || (key + '_' + idx);
+    entry.innerHTML = `<div class="name">${item.name}</div>`;
+    const ctrl = document.createElement('div');
+    ctrl.className = 'ctrl';
 
-function handleLeftRight(isRight){
-    if(currentMenu==='main'||currentIndex===0)return;
-    const items=document.querySelectorAll('[data-index]');
-    const selectedItem=Array.from(items).find(item=>parseInt(item.dataset.index)===currentIndex);
-    if(!selectedItem||!selectedItem.dataset.id)return;
-    const itemId=selectedItem.dataset.id;
-    const menuName=currentMenu; const itemIndex=currentIndex-1; const item=submenus[menuName].items[itemIndex];
-    if(item.type==='slider'){
-        let currentValue=itemStates[itemId]!==undefined?itemStates[itemId]:item.value;
-        currentValue=isRight?Math.min(item.max,currentValue+1):Math.max(item.min,currentValue-1);
-        itemStates[itemId]=currentValue; selectedItem.querySelector('.slider-fill').style.width=((currentValue-item.min)/(item.max-item.min)*100)+'%'; selectedItem.querySelector('.slider-value').textContent=currentValue;
-        sendToFiveM('sliderChanged',{id:itemId,value:currentValue});
+    if(item.type === 'toggle'){
+      const t = document.createElement('div');
+      t.className = 'toggle ' + (state.values[item.id] ? 'on' : '');
+      t.tabIndex = 0;
+      t.innerHTML = '<div class="knob"></div>';
+      t.addEventListener('click', () => toggleItem(item.id));
+      ctrl.appendChild(t);
+    } else if(item.type === 'slider'){
+      const wrap = document.createElement('div');
+      wrap.className = 'slider-wrap';
+      const track = document.createElement('div');
+      track.className = 'slider-track';
+      const fill = document.createElement('div');
+      fill.className = 'slider-fill';
+      const val = state.values[item.id] !== undefined ? state.values[item.id] : item.value;
+      const pct = percentFor(val,item.min,item.max);
+      fill.style.width = pct + '%';
+      track.appendChild(fill);
+      const valSpan = document.createElement('div');
+      valSpan.className = 'slider-value';
+      valSpan.textContent = String(val);
+      wrap.appendChild(track);
+      wrap.appendChild(valSpan);
+      // click to change
+      track.addEventListener('click', (ev)=> {
+        const rect = track.getBoundingClientRect();
+        const x = ev.clientX - rect.left;
+        const newPct = Math.max(0, Math.min(1, x / rect.width));
+        const newValue = Math.round(item.min + newPct * (item.max - item.min));
+        setValue(item.id, newValue);
+        fill.style.width = percentFor(newValue,item.min,item.max) + '%';
+        valSpan.textContent = String(newValue);
+      });
+      ctrl.appendChild(wrap);
+    } else if(item.type === 'button'){
+      const btn = document.createElement('button');
+      btn.className = 'btn';
+      btn.textContent = item.name;
+      btn.addEventListener('click', ()=> activateButton(item.id));
+      ctrl.appendChild(btn);
+    } else {
+      // generic label
+      const span = document.createElement('div');
+      span.className = 'subtitle';
+      span.textContent = item.name;
+      ctrl.appendChild(span);
     }
+
+    entry.appendChild(ctrl);
+    entry.addEventListener('click', ()=> { state.submenuIndex = idx; activateSubmenuItem(key, idx); });
+    panelBody.appendChild(entry);
+  });
+
+  // focus first entry visually
+  highlightSubmenu();
 }
 
-function sendToFiveM(event,data){ if(window.invokeNative){ fetch(`https://${GetParentResourceName()}/${event}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});}else{console.log('FiveM Event:',event,data);}}
+/* ========= UTILITIES ========= */
+function percentFor(value,min,max){
+  if(max === undefined || min === undefined) return 0;
+  return Math.round(((value - min) / (max - min)) * 100);
+}
 
-// Keyboard navigation
-window.addEventListener('keydown',e=>{
-    if(keybindListening){ keybindListening=false; itemStates[keybindTarget]=e.keyCode; const items=document.querySelectorAll('[data-index]'); Array.from(items).forEach(i=>{if(i.dataset.id===keybindTarget){i.querySelector('.slider-value').textContent=e.keyCode;}}); showNotification('Key assigned'); sendToFiveM('keybindSelected',{id:keybindTarget,key=e.keyCode}); return; }
-    if(inputActive)return;
-    switch(e.key){
-        case'ArrowUp':currentIndex=Math.max(0,currentIndex-1);updateSelection();break;
-        case'ArrowDown':currentIndex=Math.min(document.querySelectorAll('[data-index]').length-1,currentIndex+1);updateSelection();break;
-        case'ArrowLeft':handleLeftRight(false);break;
-        case'ArrowRight':handleLeftRight(true);break;
-        case'Enter':handleEnter();break;
-        case'Backspace':handleBack();break;
+function setValue(id, value){
+  state.values[id] = value;
+  sendToFiveM('setState', { id, value });
+}
+
+function toggleItem(id){
+  const newVal = !state.values[id];
+  state.values[id] = newVal;
+  // update DOM toggle visual
+  const el = panelBody.querySelector(`[data-id="${id}"] .toggle`);
+  if(el) el.classList.toggle('on', !!newVal);
+  sendToFiveM('toggleChanged', { id, state: newVal });
+}
+
+/* button action */
+function activateButton(id){
+  sendToFiveM('buttonPressed', { id });
+  // small visual feedback
+  const el = panelBody.querySelector(`[data-id="${id}"]`);
+  if(el){
+    el.style.transform = 'scale(.995)';
+    setTimeout(()=> el.style.transform = '', 120);
+  }
+}
+
+/* activate submenu item when pressing enter */
+function activateSubmenuItem(key, idx){
+  const submenu = SUBMENUS[key];
+  if(!submenu) return;
+  const item = submenu.items[idx];
+  if(!item) return;
+  if(item.type === 'toggle'){
+    toggleItem(item.id);
+  } else if(item.type === 'slider'){
+    // increase slider as default action
+    const cur = state.values[item.id] !== undefined ? state.values[item.id] : item.value;
+    const next = Math.min(item.max, cur + 1);
+    setValue(item.id, next);
+    // update visuals
+    const container = panelBody.querySelector(`[data-idx="${idx}"]`);
+    if(container){
+      const fill = container.querySelector('.slider-fill');
+      const valSpan = container.querySelector('.slider-value');
+      if(fill) fill.style.width = percentFor(next,item.min,item.max)+'%';
+      if(valSpan) valSpan.textContent = String(next);
     }
+  } else if(item.type === 'button'){
+    activateButton(item.id);
+  }
+}
+
+/* highlight submenu selection */
+function highlightSubmenu(){
+  // clear all
+  panelBody.querySelectorAll('.entry').forEach((el,i)=> {
+    el.style.border = '1px solid rgba(255,255,255,0.02)';
+    el.style.opacity = '1';
+    el.classList.remove('focused');
+  });
+  const selected = panelBody.querySelector(`[data-idx="${state.submenuIndex}"]`);
+  if(selected){
+    selected.style.border = '1px solid rgba(76,195,255,0.18)';
+    selected.style.boxShadow = '0 12px 36px rgba(76,195,255,0.04)';
+    selected.scrollIntoView({ block:'nearest', behavior:'smooth' });
+  }
+}
+
+/* update left active visual */
+function updateLeftActive(){
+  navUl.querySelectorAll('.nav-item').forEach(li => {
+    li.classList.remove('active');
+    const idx = Number(li.dataset.index);
+    if(idx === state.leftIndex && state.currentColumn === 'left') li.classList.add('active');
+  });
+  updateLeftScroll();
+}
+
+/* close submenu -> back to left nav */
+function backToLeft(){
+  state.currentColumn = 'left';
+  panelTitle.textContent = 'Main menu';
+  panelSub.textContent = 'Use arrows / WASD — Enter to select — Esc to go back';
+  panelBody.innerHTML = `<div style="opacity:.6;color:${getComputedStyle(document.documentElement).getPropertyValue('--muted')};padding:12px">Select a category from the left.</div>`;
+  updateLeftActive();
+}
+
+/* ========= NAVIGATION HANDLERS ========= */
+function navUp(){
+  if(state.currentColumn === 'left'){
+    state.leftIndex = clampLeftIndex(state.leftIndex - 1);
+    renderLeft(); updateLeftActive();
+  } else {
+    // in submenu
+    state.submenuIndex = Math.max(0, state.submenuIndex - 1);
+    highlightSubmenu();
+  }
+}
+function navDown(){
+  if(state.currentColumn === 'left'){
+    state.leftIndex = clampLeftIndex(state.leftIndex + 1);
+    renderLeft(); updateLeftActive();
+  } else {
+    // in submenu
+    const max = panelBody.querySelectorAll('.entry').length - 1;
+    state.submenuIndex = Math.min(max, state.submenuIndex + 1);
+    highlightSubmenu();
+  }
+}
+function navLeft(){
+  if(state.currentColumn === 'left') return;
+  // back to left
+  backToLeft();
+}
+function navRight(){
+  if(state.currentColumn === 'left'){
+    openSelected();
+    updateLeftActive();
+  } else {
+    // maybe open deeper? for now no deeper panels — treat as enter
+    activateSubmenuItem(state.currentColumn, state.submenuIndex);
+  }
+}
+function navEnter(){
+  if(state.currentColumn === 'left'){
+    openSelected();
+  } else {
+    activateSubmenuItem(state.currentColumn, state.submenuIndex);
+  }
+}
+function navBack(){
+  if(state.currentColumn !== 'left'){
+    backToLeft();
+  } else {
+    // if already in left - maybe close menu; we just print
+    sendToFiveM('menuClose', {});
+  }
+}
+
+/* keyboard listener */
+window.addEventListener('keydown', (e)=>{
+  const key = e.key.toLowerCase();
+  if(['arrowup','w'].includes(e.key.toLowerCase()) || key === 'w') { e.preventDefault(); navUp(); }
+  else if(['arrowdown','s'].includes(e.key.toLowerCase()) || key === 's') { e.preventDefault(); navDown(); }
+  else if(['arrowleft','a','escape','backspace'].includes(e.key.toLowerCase()) || key === 'a') { e.preventDefault(); navLeft(); }
+  else if(['arrowright','d'].includes(e.key.toLowerCase()) || key === 'd') { e.preventDefault(); navRight(); }
+  else if(e.key === 'Enter') { e.preventDefault(); navEnter(); }
+  else if(e.key === 'Escape') { e.preventDefault(); navBack(); }
 });
 
-renderMainMenu();
+/* ========= external message handler (FiveM) =========
+ Supports:
+  { action: 'navigate', direction: 'up'|'down'|'left'|'right'|'enter'|'back' }
+  { action: 'setState', id: 'xxx', value: ... }
+*/
+window.addEventListener('message', (ev)=>{
+  const data = ev.data || {};
+  if(data.action === 'navigate'){
+    if(data.direction === 'up') navUp();
+    else if(data.direction === 'down') navDown();
+    else if(data.direction === 'left') navLeft();
+    else if(data.direction === 'right') navRight();
+    else if(data.direction === 'enter') navEnter();
+    else if(data.direction === 'back') navBack();
+    return;
+  }
+  if(data.action === 'setState' && data.id!==undefined){
+    state.values[data.id] = data.value;
+    // update UI if present
+    const toggle = panelBody.querySelector(`[data-id="${data.id}"] .toggle`);
+    if(toggle) toggle.classList.toggle('on', !!data.value);
+    const fill = panelBody.querySelector(`[data-id="${data.id}"] .slider-fill`);
+    const entry = findItemById(data.id);
+    if(fill && entry){
+      const pct = percentFor(data.value, entry.min, entry.max);
+      fill.style.width = pct + '%';
+      const valSpan = panelBody.querySelector(`[data-id="${data.id}"] .slider-value`);
+      if(valSpan) valSpan.textContent = String(data.value);
+    }
+  }
+});
+
+/* helper: find item def by id in SUBMENUS */
+function findItemById(id){
+  for(const k in SUBMENUS){
+    for(const it of (SUBMENUS[k].items || [])){
+      if(it.id === id) return it;
+    }
+  }
+  return null;
+}
+
+/* FiveM send wrapper - compatible with DUI (POST) or fallback console.log */
+function sendToFiveM(eventName, data = {}){
+  try {
+    // in FiveM, you usually POST to https://<resourceName>/<eventName>
+    if(window.invokeNative || typeof window.fetch === 'function' && typeof GetParentResourceName === 'function'){
+      fetch(`https://${GetParentResourceName()}/${eventName}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json; charset=utf-8' },
+        body: JSON.stringify(data)
+      }).catch(e => console.log('sendToFiveM fetch error', e));
+    } else {
+      // not in FiveM environment: log
+      console.log('FiveM Event:', eventName, data);
+    }
+  } catch(err){
+    console.log('sendToFiveM fallback', eventName, data, err);
+  }
+}
+
+/* ========= INIT ========= */
+function init(){
+  // render left items
+  renderLeft();
+  // initial panel content
+  panelBody.innerHTML = `<div style="opacity:.7;color:var(--muted);padding:12px">Welcome. Select a category on the left to begin.</div>`;
+  updateLeftActive();
+  // give a small entrance animation
+  document.querySelectorAll('.fade-in').forEach((el, i)=> el.style.animationDelay = (i*12)+'ms');
+}
+
+/* ========= accessibility helpers: focus visuals when clicking left menu items ====== */
+navUl.addEventListener('focusin', ()=> updateLeftActive());
+
+/* run it */
+init();
 </script>
 </body>
 </html>
